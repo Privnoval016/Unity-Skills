@@ -78,6 +78,13 @@ No `UnityEvent` fields for component wiring.
 Place interfaces in the same module folder as the system they describe.
 Inject the interface, never the concrete type.
 
+## Namespace Scope
+
+A new system gets **one** namespace for its entire folder tree (e.g. `CombatEngine` for everything
+under `Assets/CombatEngine/`, however many subfolders it grows), not one namespace per subfolder.
+Decide this once, up front, when the system is first scaffolded — see the `u-style` skill's
+Namespaces section for the full rule and reasoning.
+
 ## Data-Driven Design
 
 - No magic numbers or hardcoded strings anywhere. Every tunable parameter on a SO with `[Tooltip]`.

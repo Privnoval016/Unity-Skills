@@ -51,7 +51,23 @@ Omit regions that would be empty. Do not invent new region names.
 | Interface | `IFoo` | `IValueGenerator<T>` |
 | C# event | `OnEventName` | `OnNodeInserted` |
 | Enum value | `PascalCase` | `NodeVisualState.Normal` |
-| Namespace | Scoped, not always required | `Combat`, `DynamicPhysics` |
+| Namespace | One per system, not per folder (see Namespaces below) | `CombatEngine`, `DynamicPhysics` |
+
+## Namespaces
+
+One namespace per top-level system, not one per folder. A system with many subfolders (`Actors/`,
+`Effects/`, `Targeting/`, `Simulation/`, ...) still declares the same single namespace —
+`namespace CombatEngine`, say — in every file regardless of how deep it lives. Folder structure
+documents organization; namespace is for the system as a whole.
+
+This avoids a `using` per cross-folder reference within the same system, which is most references,
+since subsystems inside one system talk to each other constantly. It also means a file can be moved
+between subfolders during a refactor without touching its namespace declaration.
+
+Only split into multiple namespaces when the pieces are genuinely separate systems someone could
+reference independently — a shared library like `Extensions` legitimately has
+`Extensions.Modifiers`, `Extensions.EventBus`, etc., since other projects import subsets of it. A
+single feature's own internal folder layout is not that case.
 
 ## Property Style
 
