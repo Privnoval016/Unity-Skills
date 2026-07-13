@@ -24,7 +24,12 @@ Before forming any questions:
 2. Read `${CLAUDE_SKILL_DIR}/../u-extensions/SKILL.md` and
    `${CLAUDE_SKILL_DIR}/../u-arch/extensions-ref.md` — identify which Extensions utilities are
    already available so you never propose reinventing them.
-3. Identify every file, system, or SO that this feature will interact with.
+3. Check for a project-level docs folder at the repo root (commonly named `.project-docs/`,
+   `ProjectDocs/`, or `docs/` — the exact name varies per project). If one exists, read any files
+   relevant to this feature (project state, installed packages, conventions, prior decisions)
+   before proceeding — never assume a package is unavailable or a convention is unset without
+   checking there first.
+4. Identify every file, system, or SO that this feature will interact with.
 
 ---
 
