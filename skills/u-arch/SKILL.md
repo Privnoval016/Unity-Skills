@@ -20,6 +20,15 @@ Also check for a project-level docs folder at the repo root (commonly named `.pr
 proposing an architecture decision — it may already document which packages are installed, which
 libraries own which responsibility, and prior decisions that should constrain the choice.
 
+## Scene Assembly
+
+Never write Editor tooling (`[MenuItem]` scripts, programmatic `GameObject`/`Canvas`/`RectTransform`
+construction, `EditorSceneManager` scene generation) to assemble scene layout on the user's behalf
+— even when it seems like it'd save time or reduce manual-step risk. Scene assembly (Canvas
+hierarchies, dragging component references, wiring Inspector fields) is the user's to do by hand in
+the Editor. Give clear step-by-step instructions instead — what to create, where, how to wire it —
+and let them build it themselves.
+
 ## MonoBehaviour Split (strict)
 
 MonoBehaviours **only** do:
