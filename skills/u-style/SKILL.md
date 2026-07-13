@@ -24,6 +24,26 @@ For extended examples and templates see [style-ref.md](style-ref.md).
   `<returns>`, `<remarks>`, `<see cref="..." />`.
 - **No inline comments** (`// ...`) anywhere. If logic needs explanation, extract a named method.
 
+**Class-level summaries stay high-level.** One or two complete sentences describing what the class
+*is* and its role — not a design-rationale excerpt. Skip the "why" (a past alternative considered,
+a historical bug it fixes, an itemized list of every case it handles) — that belongs in the plan
+document or a folder `README.md`, not repeated in the doc comment every reader hits first. Example:
+a gauge class's summary is "A bounded numeric resource an actor has, such as HP or Energy, with
+optional per-turn regen/decay and threshold-crossing behavior" — not a paragraph enumerating every
+concrete resource it backs and the historical reason the class is unified.
+
+**Method-level docs**: every public method gets a short functional-description sentence, plus
+`<param>`/`<returns>`/`<exception>` tags wherever those aren't self-evident from the name and
+signature alone. Keep it light — this is not the place for implementation narrative either; state
+what the caller needs to know (what it does, what it returns, what it throws and when), not how it
+does it internally. A trivial one-line delegating method (`IsHostile(a, b) => GetRelationship(a, b)
+== Hostile`) does not need a tag-heavy doc block on top of an already-documented class; use judgment.
+
+**Dictionary fields get a key/value comment**: every `Dictionary<TKey,TValue>` field gets a one-line
+`/** <summary>...</summary> */` stating what the key and value represent, e.g. "Keyed by resource
+type ID, resolving to that resource's live gauge." Lists get this only when the element's role isn't
+obvious from the variable name and element type — case by case, not a blanket rule like dictionaries.
+
 ## #region Vocabulary
 
 Use exactly these names, in this exact order, inside every class:
