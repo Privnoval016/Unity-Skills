@@ -87,6 +87,80 @@ No `UnityEvent` fields for component wiring.
 Place interfaces in the same module folder as the system they describe.
 Inject the interface, never the concrete type.
 
+### No hanging fields — split optional capabilities into narrow interfaces
+
+When a multi-implementer interface would need a property or method that's genuinely meaningless
+for some implementers, don't add it to the shared interface for everyone to answer. Split it into
+its own narrow, optional capability interface instead, and let only the implementers that truly
+have that capability implement it.
+
+A concrete worked example from `Assets/CombatEngine`: `ITurnAction` is implemented by
+`TechniqueAction`, `ItemAction`, `SkipTurnAction`, `JointTechniqueAction`, and others. Not all of
+them have an owner, a resource cost, or a Joint Technique priority — `SkipTurnAction` has none of
+the three; the harness's `OwnedTurnAction` wrapper has all three. Rather than bloating `ITurnAction`
+with `Owner`/`CostResource`/`CostAmount`/`JointPriority` fields that most implementers would have to
+either fake or ignore, each became its own interface — `IOwnedTurnAction`, `ICostedTurnAction`,
+`IJointTechniqueParticipant` — implemented only by whichever classes genuinely have that concept.
+`ITurnAction` itself stayed exactly as small as it was. `IFrontend` already followed this same
+pattern before this: it's composed from `IActionSelectionPort` / `ITargetSelectionPort` /
+`IJointPartnerSelectionPort` / `IJointTechniqueSelectionPort` rather than being one flat interface —
+treat that composition as the reference shape for how a "many small ports" interface should look.
+
+This generalizes beyond `ITurnAction`: whenever a new multi-implementer interface would need a
+member only some implementers can meaningfully answer, reach for a narrow optional-capability
+interface instead, by default — not just when someone happens to notice the smell.
+
+### Prefer a small interface + named strategy classes over a bare multi-parameter `Func`/enum
+
+When behavior needs to be pluggable ("who owns this," "which condition applies," "how should this
+be resolved"), reach for a small single-method interface with a few named concrete implementations
+— not a bare `Func<A, B, C>` (positional parameters can't be documented or named at the call site,
+so a three-`IActor`-parameter `Func` reads as noise) and not a closed enum (can't express "wraps
+this specific pre-existing object" or "here's a fully custom case," and adding a case means editing
+the enum's every switch statement instead of just adding a class). This is the same shape as
+`IActionValueSource`/`StandardSpeedSource`/`FixedIntervalSource`, `ITargetOrigin`/`CasterOrigin`/
+`EntityOrigin`, and `IJointPartnerEligibility`/`ProximityJointEligibility` already establish
+elsewhere in this codebase — apply it by default, not just where it already exists. Worked example:
+`Core/Effects/IEffectOwnerSelector.cs` (`ResolveOwner(IActor caster, IActor target)`) replaced an
+earlier draft's `Func<IActor, IActor, CombatContext, IModifierDuration>` parameter on
+`ApplyModifierEffect`/`ApplyStatusEffectEffect` — `BearerOwnsEffect`/`CasterOwnsEffect` read clearly
+at the call site, and `FixedOwner(owner)` covers "wraps a specific pre-registered actor" (even a
+synthetic one, like a Domain's own pseudo-actor in the turn queue) without needing a new enum case.
+
+### Reach for a generic type parameter when a primitive is genuinely reusable across trigger types
+
+Don't hardcode a primitive to the one trigger/event/key type it happens to be needed for today if
+the underlying mechanism doesn't actually care what that type is — make it generic instead, so the
+next caller with a different trigger type reuses the same class rather than a near-duplicate.
+Worked example: `Core/Modifiers/EventScopedDuration.cs`'s `EventScopedDuration<TEvent>` advances an
+inner duration only when a matching `CombatEventBus` event fires. The only concrete need today is
+"advance on a specific actor's `TurnStartEvent`" (exposed as the non-generic
+`EventScopedDuration.OwnerTurns(...)` convenience, the same companion-class-alongside-the-generic-type
+shape as `Task`/`Task<T>`), but nothing about the class itself is turn-specific — a future "expires
+when a specific actor is defeated" or "expires when a named status is removed elsewhere" trigger
+reuses the identical generic class with a different `TEvent` and predicate, not a parallel
+`DefeatScopedDuration` written from scratch.
+
+### Checking for an optional capability interface via `is` is fine — checking a concrete type is not
+
+The project's usual rule against type-checking (`is`/pattern matching used to branch on what
+something *is* rather than trusting polymorphism) still holds for **concrete types** — checking
+`is SomeConcreteClass` to decide behavior breaks encapsulation and should be avoided, same as
+always.
+
+But checking `is ISomeCapability` for one of these optional capability interfaces is a *different*,
+acceptable category — it's the same shape as `TryGetComponent<T>` in an ECS-style system, or
+checking `is IDisposable` before calling `Dispose()`. You're not asking "what concrete class is
+this", you're asking "does this thing support this specific, narrow contract" — which is trusting a
+(narrower) interface contract, not bypassing one. `JointTechniqueAction` reads
+`IOwnedTurnAction`/`ICostedTurnAction`/`IJointTechniqueParticipant` this way when scanning
+`CombatContext.ActionCatalog`, defaulting sensibly (unowned, free, default priority) when an action
+doesn't implement one — that's the intended usage pattern for these interfaces, not a workaround.
+
+The rule was never "never use `is`" — it's "never branch on a concrete implementation type instead
+of trusting the interface contract." Checking for an optional capability interface *is* trusting a
+contract, just a narrower one than the base interface.
+
 ## Namespace Scope
 
 A new system gets **one** namespace for its entire folder tree (e.g. `CombatEngine` for everything
