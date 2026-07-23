@@ -16,7 +16,7 @@ It does not fork a subagent — it reads skill files inline to keep full convers
 ## How to respond
 
 1. Identify which skills apply to the user's request (any combination of u-style, u-arch,
-   u-extensions, u-state, u-anim, u-input, u-physics, u-ui, u-plan).
+   u-extensions, u-state, u-anim, u-input, u-physics, u-ui, u-plan, u-mcp).
 2. Read `${CLAUDE_SKILL_DIR}/../<skill-name>/SKILL.md` for each relevant skill using the Read tool.
    Also read supporting files (e.g. `patterns-ref.md`, `extensions-ref.md`) if the question
    involves patterns or Extensions utilities.

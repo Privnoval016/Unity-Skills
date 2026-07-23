@@ -129,6 +129,9 @@ Standard indentation only. Do **not** add extra spaces to align `=` or type name
 - `[DisallowMultipleComponent]` on any component that must be unique per GameObject.
 - `[DefaultExecutionOrder(N)]` only when necessary to control Unity's script order.
 - `#if UNITY_EDITOR` guard all `OnDrawGizmosSelected` and editor-only debug code.
+- `Debug.LogWarning`/`Debug.LogError` messages: one brief line stating what's wrong. Not a full
+  explanation of why it matters or how to fix it — that belongs in a doc comment or chat, not a
+  runtime log line.
 
 ## Continuous Improvement
 
