@@ -14,11 +14,26 @@ Add as a git submodule from your Unity project root:
 
 ```bash
 git submodule add <url> Unity-Skills
+```
+
+Then link the skills into `.claude/skills/`:
+
+**macOS / Linux:**
+```bash
 bash Unity-Skills/install.sh
 ```
 
-`install.sh` symlinks each skill folder into `.claude/skills/` in your project. Skills are
-immediately available in the current Claude Code session — no restart required.
+**Windows:**
+```powershell
+powershell -ExecutionPolicy Bypass -File Unity-Skills\install.ps1
+```
+
+`install.sh` symlinks each skill folder into `.claude/skills/` in your project.
+`install.ps1` does the Windows equivalent using directory junctions instead of symlinks —
+real symlinks on Windows require admin rights or Developer Mode, while junctions need
+neither. Both link live: editing a skill under `Unity-Skills/skills/` is reflected in
+`.claude/skills/` immediately, with no reinstall needed. Skills are available in the
+current Claude Code session right away — no restart required.
 
 ---
 
@@ -68,5 +83,7 @@ corrections during a session. This keeps skills in sync with how you actually wo
 
 ```bash
 git submodule update --remote Unity-Skills
-bash Unity-Skills/install.sh
 ```
+
+Existing links pick up file changes automatically. Re-run the installer for your platform
+(`install.sh` or `install.ps1`) only if the update added or removed a skill folder.
