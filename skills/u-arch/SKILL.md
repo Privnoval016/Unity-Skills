@@ -192,6 +192,15 @@ Namespaces section for the full rule and reasoning.
 - Extensions.Timers for all timer/frequency needs — not per-Update countdown variables.
 - LODs on objects visible at distance.
 
+## Third-Party Standing Choices
+
+Decisions that hold across projects. Do not propose the alternative.
+
+- **Pathfinding: A\* Pathfinding Project (Aron Granberg), never Unity NavMesh.** This is permanent
+  and applies to every project, not just this one. Do not propose `NavMeshAgent`, `NavMeshSurface`,
+  `NavMesh.CalculatePath`, or the `com.unity.ai.navigation` package, and do not reach for the
+  Pipeline package's `bake_navmesh*` commands. If a task needs pathfinding, it needs A\*.
+
 ## Design Patterns
 
 For full Unity-specific examples see [patterns-ref.md](patterns-ref.md).

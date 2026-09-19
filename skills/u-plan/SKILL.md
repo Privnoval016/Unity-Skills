@@ -24,12 +24,16 @@ Before forming any questions:
 2. Read `${CLAUDE_SKILL_DIR}/../u-extensions/SKILL.md` and
    `${CLAUDE_SKILL_DIR}/../u-arch/extensions-ref.md` — identify which Extensions utilities are
    already available so you never propose reinventing them.
-3. Check for a project-level docs folder at the repo root (commonly named `.project-docs/`,
+3. Check whether the Editor is reachable (`unity pipeline list --format json`). If it is, prefer
+   reading real scene and asset state over inferring it from source — `get_scene_hierarchy`,
+   `find_gameobjects`, `get_serialized_fields`. Source tells you what should be true; the Editor
+   tells you what is.
+4. Check for a project-level docs folder at the repo root (commonly named `.project-docs/`,
    `ProjectDocs/`, or `docs/` — the exact name varies per project). If one exists, read any files
    relevant to this feature (project state, installed packages, conventions, prior decisions)
    before proceeding — never assume a package is unavailable or a convention is unset without
    checking there first.
-4. Identify every file, system, or SO that this feature will interact with.
+5. Identify every file, system, or SO that this feature will interact with.
 
 ---
 
@@ -110,7 +114,28 @@ After the user has answered all questions, write a concrete implementation plan:
 - [ ] ZLinq used instead of System.Linq where applicable
 - [ ] No Find/GetComponent in hot paths
 - [ ] Object pooling if runtime instantiation is needed
+
+## Verification
+<One runnable command per implementation step. See u-cli/recipes-ref.md.>
+- Step N: `unity command ...` / `unity test --filter ...` — expected result
 ```
+
+### The Verification section is mandatory
+
+Every plan ends with it, and every step needs a command that either passes or does not. A step nobody
+can verify is a step that gets marked done without being done.
+
+Draw the commands from `../u-cli/recipes-ref.md`: `recompile_status` for "does it build",
+`unity test --filter` for "does it work", a capture for "does it look right", `unity vcs diff` for
+"what actually changed in the scene".
+
+**Prefer project verbs.** Run `unity command --tag coc --format json` first and cite existing
+`[CliCommand]` verbs by name. For this project that currently means `coc_missing_refs` and
+`coc_asset_audit` for wiring/data integrity, `coc_validate_actors` for combat work, and
+`coc_hud_report` / `coc_theme_report` for anything visual — see `../u-cli/SKILL.md` for when each
+applies. If a step names a sequence that has no verb and that sequence has come
+up before, propose a new `[CliCommand]` for it as part of the plan — that is how the set compounds
+instead of freezing at whatever shipped first.
 
 Save the plan to `.claude/plans/<kebab-case-feature-name>.md`.
 

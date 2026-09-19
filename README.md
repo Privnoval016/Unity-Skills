@@ -37,20 +37,37 @@ current Claude Code session right away — no restart required.
 
 ---
 
-## MCP Server Setup
+## Editor Control Setup
 
-Configure the Unity MCP server in Claude Code settings so Claude can inspect your scene
-hierarchy and component data without reading binary `.unity` files.
+Claude drives the live Unity Editor through the **Unity CLI** and the `com.unity.pipeline`
+package — not through an MCP server. Unity deprecated its own in-Editor MCP server in favour of
+the CLI, which costs fewer tokens for the same work and doubles as CI tooling.
 
-**Always prefer `mcp__unity__*` tools over reading `.unity` scene files directly.**
+```bash
+# 1. Install the CLI (standalone binary, no dependencies)
+curl -fsSL https://public-cdn.cloud.unity3d.com/hub/prod/cli/install.sh | UNITY_CLI_CHANNEL=beta bash
 
-Key tools:
-- `mcp__unity__get_hierarchy` — full scene hierarchy
-- `mcp__unity__get_component_properties` — component field values on any GameObject
-- `mcp__unity__execute_menu_item` — run any Unity menu item programmatically
-- `mcp__unity__add_component` — add a component to a GameObject
-- `mcp__unity__get_gameobject_info` — position, active state, tag, layer
-- `mcp__unity__find_objects_of_type` — find all objects of a given type in the scene
+# 2. Sign in, then add the Pipeline package to the project
+unity auth login
+unity pipeline install
+
+# 3. Focus the Unity Editor window — it resolves the manifest on focus, and
+#    the Pipeline server does not start until it does.
+unity pipeline list        # expect Pipeline: true, Server Reachable: true
+```
+
+`unity command` then lists what the Editor exposes (151 commands on Unity 6000.5 with package
+0.7.0-exp.1). See the `u-cli` skill for the safety model, the session gate, the guarded Play Mode
+loop and the full catalog.
+
+**Never read `.unity` or `.prefab` files directly to answer a question about scene state.** Use
+`unity command get_scene_hierarchy` / `find_gameobjects` for reads and `unity vcs diff` for changes —
+the latter diffs by GameObject and component name instead of by fileID.
+
+### Vendored reference material
+
+`vendor/unity/` holds copies of Unity's official agent skills, cited by the `u-*` skills but never
+loaded as skills themselves (`install.sh` only links `skills/*/`). See `vendor/README.md`.
 
 ---
 
@@ -66,7 +83,8 @@ Key tools:
 | `/u-anim` | Yes | Animancer backend, IAnimationDriver, SO anim defs |
 | `/u-input` | Yes | IInputSource abstraction, typed buttons, grace windows |
 | `/u-physics` | Yes | Orchestrated physics, context reuse, modifier pipeline |
-| `/u-ui` | Yes | ThemeConfig adapters, modular UI, PrimeTween |
+| `/u-ui` | Yes | ThemeConfig adapters, modular UI, PrimeTween, visual design, UI Toolkit |
+| `/u-cli` | Yes | Driving the live Editor: captures, console, tests, scene diffs, project verbs |
 | `/u-review` | Manual only | Full code review → ReportFindings (user-invoked) |
 | `/u-plan` | Manual only | Planning assistant — thorough Q&A before any implementation |
 

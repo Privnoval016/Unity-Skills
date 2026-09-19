@@ -14,6 +14,31 @@ allowed-tools: Read Bash
 
 !`git diff main...HEAD --name-only`
 
+## Non-C# changes
+
+`git diff` on a `.unity` or `.prefab` file is unreadable, which is how scene changes go unreviewed.
+Before the C# pass:
+
+```bash
+unity vcs status                              # grouped by what it means to Unity
+unity vcs diff <path-to-.unity-or-.prefab>    # by GameObject and component name, not fileID
+unity vcs affected --format json              # which assemblies and tests this diff touches
+unity vcs doctor                              # ignore rules, LFS, meta pairing, package pinning
+```
+
+Review every changed scene and prefab this way. `vcs doctor` reports defects, not style: ignored
+`.meta` files come back as errors and genuinely break references on a fresh clone.
+
+Then run the tests the change actually touches, rather than the whole suite:
+
+```bash
+unity test --mode EditMode --filter <from vcs affected> --format json
+```
+
+**Exit code `8` means tests ran and failed. `1` means the run itself broke.** Do not conflate them —
+reporting a broken harness when the real answer is "your tests fail" wastes a cycle. See
+`../u-cli/recipes-ref.md` §2.
+
 ## Instructions
 
 Review every C# file listed above. Read each one in full before reporting findings.
@@ -77,6 +102,19 @@ Output all findings using the `ReportFindings` tool. Do not also output them as 
 - [ ] No `UnityEvent` fields in UI components
 - [ ] No runtime `Instantiate` for UI elements
 - [ ] No hardcoded `Color(r,g,b)` values — ThemeConfig adapter or SO token used
+
+### UI visual (`u-ui/design-ref.md`)
+- [ ] New list/menu screens state initial index, wrap behaviour, and how unusable entries are skipped
+      (navigation here is bespoke via `IInputSource`, not `Selectable`/`EventSystem`)
+- [ ] Anything anchored to a screen edge accounts for `Screen.safeArea`
+- [ ] New canvases match the existing scaler config (ScaleWithScreenSize, 1920x1080, match 0)
+- [ ] `coc_validate_actors` and `coc_hud_report` run clean, or the new failures are explained
+- [ ] No critical state encoded in colour alone (shape, icon or position backs it)
+- [ ] Meter and panel values initialise on bind, not only on a change event
+
+### URP render features (`../../vendor/unity/validate-urp-render-graph-renderer-feature/`)
+- [ ] Any `ScriptableRendererFeature` touched follows Render Graph rules — resource wiring, material
+      binding, descriptor usage
 
 ### Extensions (`u-extensions`)
 - [ ] No reinvention of EventBus, PushdownAutomata, MonoBehaviourUpdatable, Timers, ICondition,

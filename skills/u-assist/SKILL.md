@@ -16,7 +16,7 @@ It does not fork a subagent — it reads skill files inline to keep full convers
 ## How to respond
 
 1. Identify which skills apply to the user's request (any combination of u-style, u-arch,
-   u-extensions, u-state, u-anim, u-input, u-physics, u-ui, u-plan, u-mcp).
+   u-extensions, u-state, u-anim, u-input, u-physics, u-ui, u-plan, u-cli).
 2. Read `${CLAUDE_SKILL_DIR}/../<skill-name>/SKILL.md` for each relevant skill using the Read tool.
    Also read supporting files (e.g. `patterns-ref.md`, `extensions-ref.md`) if the question
    involves patterns or Extensions utilities.
@@ -28,6 +28,13 @@ It does not fork a subagent — it reads skill files inline to keep full convers
    questions as needed — never assume architectural decisions. Probe every integration boundary,
    SO role, lifecycle, and hot path concern.
 5. Synthesize a unified response applying all relevant skill rules.
+
+## Editor access
+
+If the task touches the actual scene, prefabs, SO assets or how the UI looks, read `../u-cli/SKILL.md`
+and work against the live Editor rather than inferring from source. **Before the first mutating
+command in a session, ask once whether to drive the Editor live** — that gate lives in `u-cli` and
+applies here too. Reads never need it.
 
 ## Asking questions before code changes
 

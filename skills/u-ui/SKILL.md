@@ -4,12 +4,15 @@ description: >
   binding layer (Observable<T> / ViewModelBase / View<T>), a UINavigationHost screen stack built on
   Extensions.PushdownAutomata, injectable IPanelTransition animations via PrimeTween, and pooled
   widgets. Changing the entire UI theme means changing one SO; changing a widget's animation means
-  swapping one field.
+  swapping one field. Owns ALL runtime game UI in this project, including visual design
+  (design-ref.md) and UI Toolkit (uitk-ref.md).
 when_to_use: >
   Building or reviewing any Unity UI, questions about "theme", "ThemeConfig", "ThemeColorAdapter",
   "color tokens", "ViewModel", "Observable", "UINavigationHost", "UIScreen", "PanelTransition",
-  "PrimeTween", "UI animation", "Canvas", "widget pool".
-allowed-tools: Read Edit Write AskUserQuestion
+  "PrimeTween", "UI animation", "Canvas", "widget pool". Also any question about how the UI *looks* —
+  layout, spacing, contrast, readability, visual hierarchy, art direction — and anything about UI
+  Toolkit, UXML, USS or UIDocument.
+allowed-tools: Read Edit Write Bash AskUserQuestion
 ---
 
 ## Overview
@@ -18,6 +21,23 @@ UI must be modular, theme-driven, and MVVM-bound. Changing the visual style of t
 requires changing one SO — no scene edits, no hunting through individual components. Changing a
 widget's animation requires swapping one field. This is the architecture actually implemented under
 `Assets/Game/UI/` — read the real files there before assuming a signature; this doc summarizes intent.
+
+## This skill owns runtime game UI
+
+Generic Unity UI skills — including Unity's own `ui` router and `ui-ugui` — tell an agent to generate
+Canvas hierarchies from scratch and know nothing about `ThemeConfig`, `View<T>`, `AnimatedPanel` or
+`UIWidgetPool`. Following them produces UI that renders and violates every rule below.
+
+**This skill decides architecture for all runtime game UI here.** Vendored material under
+`../../vendor/unity/` is reference for framework *mechanics* only — never for structure. `ui-ugui`'s
+`SKILL.md` is deliberately not vendored for this reason; only its references are.
+
+| Concern | Read |
+|---|---|
+| Architecture, theming, MVVM, navigation, pooling | this file |
+| How it looks, and the screenshot critique rubric | [design-ref.md](design-ref.md) |
+| UI Toolkit, UXML/USS, runtime binding | [uitk-ref.md](uitk-ref.md) |
+| Driving the Editor, capturing what you built | `../u-cli/` |
 
 ## Theme System (`Assets/Game/UI/Theme/`)
 
@@ -145,9 +165,19 @@ numbers, technique/item list entries — any dynamic list.
 
 Every reusable widget is a prefab (View + optional `AnimatedPanel` + theme adapters), bound to an
 element ViewModel at rent time. Style changes to the prefab propagate to every usage. Elements that
-animate frequently should live on their own sub-Canvas (batching). **Scene/prefab assembly is the
-designer's job** — provide components and clear wiring instructions, don't script the Canvas hierarchy
-together.
+animate frequently should live on their own sub-Canvas (batching).
+
+**Scene and prefab assembly may be done through `u-cli`, but only when the result is then captured
+and shown.** That rule used to read "scene/prefab assembly is the designer's job," which was correct
+while the UI could not be seen — building a hierarchy blind is guessing. With capture available the
+honest version is: assemble, capture, run [design-ref.md](design-ref.md)'s rubric, show the image.
+Structural scene authoring the user wants to own stays theirs; ask rather than assume.
+
+**Seeing the result is not free.** Screen Space - Overlay UI does not appear in any Edit-mode capture
+— verified, both `capture_game_view --source camera` and `screenshot --view game` return the 3D scene
+with no HUD. Overlay UI needs `capture_game_view --source screen`, which is Play Mode only, via the
+guarded loop in `../u-cli/recipes-ref.md` §4. World Space canvases capture fine in Edit mode. Check
+`RenderMode` before promising a screenshot.
 
 ## Events
 
@@ -164,6 +194,12 @@ No `UnityEvent` fields in UI component wiring. Use C# events (ViewModel → View
 - Is this a reusable widget that needs a prefab + `UIWidgetPool`? How many pre-warmed?
 - Does this panel need enter/exit animation? Which `IPanelTransition`, and which `ThemeConfig` timing
   profile entry backs it?
+- **How is this reached with a gamepad?** This project uses no `Selectable`/`EventSystem` focus at
+  all — navigation is an index driven by `IInputSource.Navigate`. State the initial index, the wrap
+  behaviour, how unusable entries are skipped, and how the highlight survives pooling. See
+  [design-ref.md](design-ref.md).
+- Is anything anchored to a screen edge? Then it needs `Screen.safeArea`. Nothing currently reads it.
+- `CanvasScaler` is already uniform (ScaleWithScreenSize, 1920x1080, match 0). Match it, don't diverge.
 
 ## Continuous Improvement
 
