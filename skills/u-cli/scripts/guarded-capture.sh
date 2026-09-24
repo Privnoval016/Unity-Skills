@@ -11,6 +11,8 @@
 #   - console error count rising above (snapshot + ALLOWED_NEW_ERRORS); the default of 1 tolerates a
 #     standing error that some plugins log on every scene change
 #   - a modal dialog blocking the Editor (commands time out)
+# Optional env PRECAPTURE_WAIT: seconds to wait after PRECAPTURE_EVAL (default 0.5); raise it when the
+# eval opens screens that animate in.
 # Optional env PRECAPTURE_EVAL: C# for `eval`, run just before the capture (e.g. hide canvases to get
 # a clean plate). Play Mode only, so nothing it changes persists.
 # Needs OS focus: set_autotick does NOT advance the Play Mode player loop; editor_focus does. This
@@ -49,7 +51,7 @@ f2=$(ev 'return UnityEngine.Time.frameCount;')
 [ -n "$f1" ] && [ -n "$f2" ] && [ "$f2" -gt "$f1" ] || abort "frames not advancing ($f1 -> $f2)"
 now=$(q console_status | field "d['groundTruth']['consoleErrors']")
 [ -n "$now" ] && [ "$now" -le $((base + ALLOWED_NEW_ERRORS)) ] || abort "errors rose $base -> $now"
-if [ -n "${PRECAPTURE_EVAL:-}" ]; then q eval --code "$PRECAPTURE_EVAL" >/dev/null; sleep 0.5; fi
+if [ -n "${PRECAPTURE_EVAL:-}" ]; then q eval --code "$PRECAPTURE_EVAL" >/dev/null; sleep "${PRECAPTURE_WAIT:-0.5}"; fi
 q eval --code "UnityEngine.ScreenCapture.CaptureScreenshot(\"$OUT\"); return 0;" >/dev/null
 sleep 2
 stop
