@@ -35,6 +35,7 @@ Canvas hierarchies from scratch and know nothing about `ThemeConfig`, `View<T>`,
 | Concern | Read |
 |---|---|
 | Architecture, theming, MVVM, navigation, pooling | this file |
+| The project's style bible, if it has one (here: `Design/STYLE.md`). **Read first for any visual work** | project root |
 | How it looks, and the screenshot critique rubric | [design-ref.md](design-ref.md) |
 | UI Toolkit, UXML/USS, runtime binding | [uitk-ref.md](uitk-ref.md) |
 | Driving the Editor, capturing what you built | `../u-cli/` |

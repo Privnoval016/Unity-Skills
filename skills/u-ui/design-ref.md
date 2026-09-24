@@ -3,9 +3,14 @@
 `SKILL.md` covers how UI is wired. This covers whether it looks good, and it is a separate
 question with separate failure modes.
 
+**If the project has a style bible, it outranks this file.** This file holds method: the rubric,
+readability, how a design language is derived. A project's style bible holds the *answers*. In Chains
+of Contract that is `Design/STYLE.md` (colour, type, motion, signatures, asset rules) and
+`Design/GAME.md` (the fiction it was derived from). Read STYLE.md before any visual work there.
+
 ## Read this first: check for a bug before you critique taste
 
-`BATTLE-SYSTEM.md` §11 says visual polish was "intentionally left simple/functional… real design
+`Design/combat/battle-system.md` §11 says visual polish was "intentionally left simple/functional… real design
 work for a later pass," and §17 opens with Phase 7 having "shipped functionally correct but visually
 under-baked." The UI is not a failure to correct. It is a deferral.
 
@@ -133,15 +138,16 @@ light-and-shadow technique and builds an interface whose contrast *is* the theme
    machinery is currently holding placeholder values.
 5. Capture, run the rubric, revise.
 
-### Blocked: the fiction does not exist yet
+### Never invent the fiction
 
-`draft.txt` is 1109 words of pure mechanics with no setting, tone or lore. `party-members.md` has 14
-`TBD` entries and its three archetypes (Berserker, Mage, Summoner) carry mechanics only. **There is
-currently nothing to derive a design language from.**
+The procedure needs real fiction as input. If the setting, tone or motifs are not written down, ask;
+do not supply them. An invented motif produces a confident-looking interface that contradicts the
+game once the fiction is written, and that is more expensive to undo than to defer.
 
-Do not invent one. An invented motif produces a confident-looking interface that contradicts the game
-once the fiction is written, and that is more expensive to undo than to defer. Ask for the setting,
-tone and the meaning of the title's two nouns before running step 1.
+In Chains of Contract the procedure has been run (2026-09-23): the fiction is in `Design/GAME.md`
+and the derived language in `Design/STYLE.md`. Use the procedure now to **extend** that language, for
+example deriving a new character's signature or a family's crest and palette, and record the
+result in STYLE.md rather than here.
 
 ### The schema to write it in
 
@@ -180,6 +186,8 @@ loud layout legible. Both halves, or neither.
 
 ## Related
 
+- `Design/STYLE.md`, `Design/GAME.md` — this project's derived language and its source fiction
+- `Design/ASSET-REQUESTS.md` — where raster and identity assets are requested; never generate them
 - `u-cli/recipes-ref.md` §3, §4 — how to capture what you are critiquing
 - `dataviz` (first-party skill) — meter and stat-tile guidance, contrast validator
 - `../../vendor/unity/optimize-text-mesh-pro/` — TMP font stacks, SDF, AutoSize discipline

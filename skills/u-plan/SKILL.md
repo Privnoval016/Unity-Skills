@@ -28,11 +28,13 @@ Before forming any questions:
    reading real scene and asset state over inferring it from source — `get_scene_hierarchy`,
    `find_gameobjects`, `get_serialized_fields`. Source tells you what should be true; the Editor
    tells you what is.
-4. Check for a project-level docs folder at the repo root (commonly named `.project-docs/`,
+4. Check for a project-level docs folder at the repo root (commonly named `Design/`, `.project-docs/`,
    `ProjectDocs/`, or `docs/` — the exact name varies per project). If one exists, read any files
    relevant to this feature (project state, installed packages, conventions, prior decisions)
    before proceeding — never assume a package is unavailable or a convention is unset without
-   checking there first.
+   checking there first. If it holds a master game document or style bible (in this project,
+   `Design/GAME.md` and `Design/STYLE.md`), any feature with a visible surface is planned against
+   them, and any decision they mark **Open** is asked about, never assumed.
 5. Identify every file, system, or SO that this feature will interact with.
 
 ---

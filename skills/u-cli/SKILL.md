@@ -72,8 +72,10 @@ second**, so this loop is built to detect and abort rather than to trust:
 1. `console_status` — snapshot `groundTruth.consoleErrors`. **Do not require zero.** This project
    carries a benign pre-existing error (Odin's `ProjectWatcher` against Unity 6000.5), so a
    zero-errors precondition blocks Play Mode forever. Abort only if the count *rises*.
-2. `set_autotick enable=true interval_ms=16` — forces `EditorApplication.SignalTick` so an unfocused
-   Editor keeps advancing.
+2. `editor_focus`. **Play Mode only advances with OS focus.** `set_autotick` keeps the *Editor*
+   ticking but was verified (2026-09-23) *not* to advance the Play Mode player loop: `frameCount`
+   stayed at 2 for six seconds until `editor_focus`. Focusing takes focus from the user's terminal;
+   say so when you do it.
 3. `editor_play`, then poll `editor_status` against a declared wall-clock timeout.
 4. **Abort on any of:** timeout reached, frame count not advancing between polls, or the error count
    rising above the snapshot. Abort means `editor_stop` immediately, then the console tail to the user.
@@ -83,6 +85,18 @@ second**, so this loop is built to detect and abort rather than to trust:
 
 Never simulate input, never drive a gameplay sequence longer than the declared timeout, and never
 leave Play Mode running at the end of a turn. Anything needing real play-testing is the user's.
+
+**Run the loop with [scripts/guarded-capture.sh](scripts/guarded-capture.sh)** rather than by hand:
+`guarded-capture.sh Temp/shot.png <wait-seconds> [setup command]`. It implements every guard above,
+captures through `ScreenCapture.CaptureScreenshot` into gitignored `Temp/` (overlay UI included, and
+no megabyte of base64 dumped into context), and always stops Play Mode.
+
+**Modal dialogs block everything.** A native dialog (for example Cinemachine's "Save changes made in
+Play Mode") holds the main thread; every main-thread command then times out, including
+`editor_status`. If commands start timing out right after `editor_stop`, suspect a dialog and ask
+the user to dismiss it. Cinemachine's Save During Play is a per-machine EditorPref
+(`SaveDuringPlay_Enabled`); keep it off, because it also writes runtime camera changes back into the
+scene.
 
 **Why Play Mode is unavoidable for UI work:** neither `capture_game_view --source camera` nor
 `screenshot --view game` includes Screen Space - Overlay UI in Edit mode — verified empirically on

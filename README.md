@@ -90,6 +90,25 @@ loaded as skills themselves (`install.sh` only links `skills/*/`). See `vendor/R
 
 ---
 
+## Agents
+
+`agents/` holds subagent definitions, linked file by file into `.claude/agents/` by the install
+scripts. **Agent definitions load at session start:** restart Claude Code after installing.
+
+| Agent | Role | Edits? | Drives Editor? |
+|---|---|---|---|
+| `ui-builder` | Implements UI; proves it with captures and the rubric | Yes | **Yes, the only one**, when live control was approved |
+| `shader-artist` | Shaders, post-processing, TMP effects, procedural shapes, font engineering | Yes | Reads only |
+| `style-critic` | Adversarial visual review against the style bible | No | Reads and captures |
+| `code-auditor` | u-* standards audit with verified file:line findings | No | Reads only |
+| `reference-researcher` | Sources and licenses references; verifies claims | `Design/references/` only | No |
+
+Subagents cannot ask the user questions and do not receive auto-memory, so hard rules live in each
+project's `CLAUDE.md`, and every agent stops and reports when a decision is missing rather than
+guessing. The main session makes design decisions; agents execute them.
+
+---
+
 ## Self-Refinement
 
 Every skill will offer to update its own `SKILL.md` when you provide new preferences or

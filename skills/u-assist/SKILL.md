@@ -20,7 +20,7 @@ It does not fork a subagent — it reads skill files inline to keep full convers
 2. Read `${CLAUDE_SKILL_DIR}/../<skill-name>/SKILL.md` for each relevant skill using the Read tool.
    Also read supporting files (e.g. `patterns-ref.md`, `extensions-ref.md`) if the question
    involves patterns or Extensions utilities.
-3. Check for a project-level docs folder at the repo root (commonly named `.project-docs/`,
+3. Check for a project-level docs folder at the repo root (commonly named `Design/`, `.project-docs/`,
    `ProjectDocs/`, or `docs/` — the exact name varies per project). If one exists, read any files
    relevant to the request — installed packages, project state, conventions, prior decisions —
    before answering, so guidance reflects what's actually installed in this specific project.

@@ -15,7 +15,7 @@ allowed-tools: Read Edit Write AskUserQuestion
 These rules apply to every system in the project. For design pattern details see
 [patterns-ref.md](patterns-ref.md). For the Extensions library see [extensions-ref.md](extensions-ref.md).
 
-Also check for a project-level docs folder at the repo root (commonly named `.project-docs/`,
+Also check for a project-level docs folder at the repo root (commonly named `Design/`, `.project-docs/`,
 `ProjectDocs/`, or `docs/` — the exact name varies per project). If one exists, consult it before
 proposing an architecture decision — it may already document which packages are installed, which
 libraries own which responsibility, and prior decisions that should constrain the choice.

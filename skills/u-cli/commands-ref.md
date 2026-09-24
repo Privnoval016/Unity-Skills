@@ -102,7 +102,13 @@ Carried forward from the MCP era plus what this migration found. Each was learne
     field's reported `instanceID` may be the *referenced component's own* ID, not its GameObject's.
     Querying a GameObject endpoint with a component ID fails in a way that reads like "this
     reference is broken." Check the owner's component listing before concluding anything is wrong.
-12. **Play Mode has genuinely hung this Editor**, not merely throttled it — an error loop, separate
+12. **`set_autotick` does not keep Play Mode running without focus.** Verified 2026-09-23: with
+    autotick on and the Editor unfocused, `Time.frameCount` stayed at 2. `editor_focus` fixed it
+    immediately. (`PlayerSettings.runInBackground` is false in this project.)
+13. **Modal dialogs block the pipeline.** Main-thread commands time out while any native dialog is
+    open. Cinemachine's Save During Play dialog appears on every Play Mode exit when its EditorPref
+    is on.
+14. **Play Mode has genuinely hung this Editor**, not merely throttled it — an error loop, separate
     from the unfocused-throttling problem `set_autotick` solves. This is why the guarded loop detects
     and aborts rather than trusting.
 

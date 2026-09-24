@@ -112,12 +112,16 @@ been initialization and layout bugs more often than taste.
 
 The only way to see a Screen Space - Overlay HUD. Every step is a guard; none is optional.
 
+**Use the script:** `scripts/guarded-capture.sh <out.png> [wait-seconds] [setup command...]`. The
+manual steps below are what it does.
+
 ```bash
 # 1. Snapshot the error count. Do NOT require zero — abort only if it RISES.
 unity command console_status --format json
 
-# 2. Keep the Editor ticking while it lacks OS focus.
-unity command set_autotick --enable true --interval_ms 16 --format json
+# 2. Play Mode needs OS focus: set_autotick does not advance the player loop. This takes focus
+#    from the user's terminal.
+unity command editor_focus --format json
 
 # 3. Enter Play Mode.
 unity command editor_play --format json
@@ -130,8 +134,10 @@ unity command wait_for \
 # ...or poll manually with a wall-clock budget if no condition expresses the beat.
 unity command editor_status --format json
 
-# 5. Capture with the overlay UI included (inline; no save_path, nothing written to Assets).
-unity command capture_game_view --source screen --format json
+# 5. Capture with overlay UI included, to a file in gitignored Temp/ (not inline base64, which is
+#    hundreds of KB of context per shot).
+unity command eval --code 'UnityEngine.ScreenCapture.CaptureScreenshot("Temp/shot.png"); return 0;'
+# (inline alternative: capture_game_view --source screen --max_resolution 640)
 
 # 6. ALWAYS stop, including on every abort path.
 unity command editor_stop --format json
