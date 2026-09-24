@@ -116,6 +116,12 @@ Carried forward from the MCP era plus what this migration found. Each was learne
 16. **Play Mode has genuinely hung this Editor**, not merely throttled it — an error loop, separate
     from the unfocused-throttling problem `set_autotick` solves. This is why the guarded loop detects
     and aborts rather than trusting.
+17. **Save open scenes before `run_tests`.** A dirty scene makes the test runner raise a modal save
+    dialog, which blocks every main-thread command until a human clicks it; the run just times out.
+    `eval --code 'UnityEditor.SceneManagement.EditorSceneManager.SaveOpenScenes(); return 0;'` first.
+18. **A stack overflow in test or `run_script` code kills the Editor outright** (Mono cannot recover).
+    After any crash, read the newest `~/Library/Logs/DiagnosticReports/Unity-*.ips` and the tail of the
+    project's `Logs/Editor-prev.log` (the last test started) before running anything again.
 
 ## Catalog
 
