@@ -11,6 +11,8 @@
 #   - console error count rising above (snapshot + ALLOWED_NEW_ERRORS); the default of 1 tolerates a
 #     standing error that some plugins log on every scene change
 #   - a modal dialog blocking the Editor (commands time out)
+# Optional env PRECAPTURE_EVAL: C# for `eval`, run just before the capture (e.g. hide canvases to get
+# a clean plate). Play Mode only, so nothing it changes persists.
 # Needs OS focus: set_autotick does NOT advance the Play Mode player loop; editor_focus does. This
 # script calls editor_focus, which takes focus away from the user's terminal.
 set -u
@@ -25,6 +27,10 @@ try:
 except Exception: print("")'; }
 q(){ unity command "$@" --timeout 20 --format json 2>/dev/null | res; }
 field(){ python3 -c "import json,sys; d=json.loads(sys.stdin.read() or '{}'); print(eval(sys.argv[1]))" "$1" 2>/dev/null; }
+ev(){ unity command eval --code "$1" --timeout 20 --format json 2>/dev/null | res | python3 -c 'import json,sys
+t=sys.stdin.read().strip()
+try: d=json.loads(t); print(d.get("result","") if isinstance(d,dict) else d)
+except Exception: print(t)'; }
 stop(){ unity command editor_stop --timeout 20 >/dev/null 2>&1; echo "[capture] play mode stopped"; }
 abort(){ echo "[capture] ABORT: $*"; stop; exit 1; }
 
@@ -37,12 +43,13 @@ for i in $(seq 1 30); do pm=$(q editor_status | field "d.get('playMode')"); [ "$
 [ "$pm" = "playing" ] || abort "did not enter play mode"
 sleep 1
 if [ ${#SETUP[@]} -gt 0 ]; then echo "[capture] setup: ${SETUP[*]}"; q "${SETUP[@]}" >/dev/null; fi
-f1=$(q eval --code 'return UnityEngine.Time.frameCount;')
+f1=$(ev 'return UnityEngine.Time.frameCount;')
 sleep "$WAIT"
-f2=$(q eval --code 'return UnityEngine.Time.frameCount;')
+f2=$(ev 'return UnityEngine.Time.frameCount;')
 [ -n "$f1" ] && [ -n "$f2" ] && [ "$f2" -gt "$f1" ] || abort "frames not advancing ($f1 -> $f2)"
 now=$(q console_status | field "d['groundTruth']['consoleErrors']")
 [ -n "$now" ] && [ "$now" -le $((base + ALLOWED_NEW_ERRORS)) ] || abort "errors rose $base -> $now"
+if [ -n "${PRECAPTURE_EVAL:-}" ]; then q eval --code "$PRECAPTURE_EVAL" >/dev/null; sleep 0.5; fi
 q eval --code "UnityEngine.ScreenCapture.CaptureScreenshot(\"$OUT\"); return 0;" >/dev/null
 sleep 2
 stop
