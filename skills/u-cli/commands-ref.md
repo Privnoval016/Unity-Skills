@@ -108,7 +108,12 @@ Carried forward from the MCP era plus what this migration found. Each was learne
 13. **Modal dialogs block the pipeline.** Main-thread commands time out while any native dialog is
     open. Cinemachine's Save During Play dialog appears on every Play Mode exit when its EditorPref
     is on.
-14. **Play Mode has genuinely hung this Editor**, not merely throttled it — an error loop, separate
+14. **`run_tests` result keys differ by mode.** Synchronous runs return `Summary`/`Results`;
+    `test_status` for async runs returns `summary`/`results`. Parse both.
+15. **A domain reload during an async test run can hang it** (`status: running` forever, main-thread
+    commands timing out). `cancel_tests`, then rerun synchronously. Don't save assets or recompile
+    while tests are in flight.
+16. **Play Mode has genuinely hung this Editor**, not merely throttled it — an error loop, separate
     from the unfocused-throttling problem `set_autotick` solves. This is why the guarded loop detects
     and aborts rather than trusting.
 
