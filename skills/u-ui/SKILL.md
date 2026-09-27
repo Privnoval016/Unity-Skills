@@ -43,17 +43,31 @@ Canvas hierarchies from scratch and know nothing about `ThemeConfig`, `View<T>`,
 ## Theme System (`Assets/Game/UI/Theme/`)
 
 **`ThemeConfig`** (SO, `[CreateAssetMenu(menuName = "Game/UI/Theme Config")]`) is the global style
-authority: semantic colors via `GetColor(ThemeColorToken)`, fonts via `GetFont(ThemeFontRole)`, and
-the animation profile (`PanelTransitionDuration`/`Ease`, `FadeDuration`/`Ease`, button press
-scale/duration, tooltip fade). One `.asset` per visual theme.
+authority, and **the only place a colour is set**. Colour is two layers:
 
-**`ThemeColorToken`** / **`ThemeFontRole`** are the semantic slots (`Primary`, `Accent`, `Surface`,
-`TextPrimary`, `Danger`, …) — components reference a token, never a raw `Color`/`TMP_FontAsset`.
+- **Swatches** (`ThemeSwatch`: the ink scale Charred…Paper, Vermilion, Iron, KeyLip, SilkPattern) are
+  the named colours. Change one and everything using it follows.
+- **Tokens** (`ThemeColorToken`: Ground, Panel, Lit, TextPrimary, TextSecondary, …) pick a swatch and
+  an opacity **per ground** (`ThemeGround.Ink` for combat, `Paper` for menus). Components ask for
+  `GetColor(token, ground)`, never a raw `Color`. `GetSwatch(swatch)` is for the rare non-semantic look.
+- **Themed materials**: shader colours a Graphic's vertex colour can't reach (outlines, a key-cap's
+  lip, seal paper, TMP halos, markers, ground marks, silk) are rows in ThemeConfig's
+  `materialBindings` ({material, property, token or swatch}). The theme writes them on every edit and
+  when it becomes active. **Never bake a palette colour into a material or prefab by script**: add a
+  binding.
+
+It also holds type (`GetTypeStyle(ThemeFontRole)`: font, material preset, casing, tracking), motion
+(`Snap`, `Strike`, `Bleed`, `Dry` as unscaled-time `TweenSettings`, plus `MieHoldDuration`,
+`CommitHoldDuration`), the meters' `CostPreviewAlpha`, and layout (`GridUnit`, `SafeMargin`).
+`ThemePaletteTests` pins every token's colour; change them only with a deliberate palette change.
+Editing the asset re-applies at once in Edit and Play mode (`ThemeConfig.Edited`).
 
 **`IThemeProvider` / `ThemeService`** is the single source of truth for the *active* theme, registered
 via the project's `Services` locator (not a per-adapter serialized reference — that breaks the moment
 you swap to a genuinely different theme asset, and never reaches a widget pooled in after the swap).
-`ThemeService.SetActive(theme)` swaps it and raises `ThemeChangedEvent` on `EventBus<T>`.
+`ThemeService.SetActive(theme)` swaps it and raises `ThemeChangedEvent` on `EventBus<T>`; so does
+editing the active theme during play. A View that styles itself on demand (not through an adapter)
+must also listen for `ThemeChangedEvent` and restyle.
 
 **`ThemeAdapter`** (abstract base) resolves the theme via `ActiveTheme.Resolve(fallbackTheme)` —
 registered active theme if present, else the serialized fallback (so a prefab still previews sensibly
@@ -121,8 +135,7 @@ The stack starts empty — call `Push` once with the flow's first screen to seed
 **`IPanelTransition`** (`PlayInAsync`/`PlayOutAsync(RectTransform, CanvasGroup, ThemeConfig)`) is the
 pluggable enter/exit animation, chosen per widget via `[SerializeReference]` — swapping the concrete
 type restyles a widget's animation without touching code. Ships with `FadeTransition`,
-`FadeScaleTransition` (fade + scale-up from a configurable start scale), `SlideTransition` (fade + slide
-from an anchored-position offset). Every implementation reads its timing/ease from the passed
+`SnapTransition` and `BrushTransition`. Every implementation reads its timing/ease from the passed
 `ThemeConfig` — never a hardcoded literal.
 
 **`AnimatedPanel`** ties a transition to visibility: `ShowAsync()` enables the `Canvas` then plays the
@@ -132,20 +145,22 @@ full rebuild on re-enable.
 
 **A move/scale transition never animates the Canvas's own RectTransform — always a child.** A root
 Screen Space canvas has its RectTransform forcibly resized/repositioned by Unity every frame to fill
-the screen; any script change to it gets overridden on the next layout pass, so `FadeScaleTransition`/
-`SlideTransition` silently don't work if pointed at it. `AnimatedPanel` requires only `Canvas` +
+the screen; any script change to it gets overridden on the next layout pass, so a move/scale
+transition silently doesn't work if pointed at it. `AnimatedPanel` requires only `Canvas` +
 `CanvasGroup` on its own GameObject (both safe to touch directly — `enabled` and `alpha` aren't layout
 properties) and a separate serialized `Content` field pointing at a child `RectTransform`, which is
 what transitions actually move/scale. `FadeTransition` (alpha-only) doesn't need `Content` at all.
 
 ```csharp
-// Correct — PrimeTween's Tween/Sequence are directly awaitable
-await Tween.Alpha(canvasGroup, 0f, 1f, theme.FadeDuration, theme.FadeEase);
-await Sequence.Create(Tween.Alpha(cg, 0f, 1f, d, e)).Group(Tween.Scale(rt, Vector3.one, d, e));
+// Correct — timing from ThemeConfig, unscaled, sequences from theme.NewSequence()
+_fade = Tween.Alpha(group, new TweenSettings<float>(group.alpha, 1f, theme.Strike));
+_motion = theme.NewSequence().Chain(Tween.Scale(rect, new TweenSettings<Vector3>(from, Vector3.one, theme.Snap)));
 
-// Wrong — hardcoded values instead of ThemeConfig
-await Tween.Alpha(canvasGroup, 0f, 1f, 0.2f, Ease.OutSine);
+// Wrong — hardcoded values, scaled time (freezes during a mie)
+Tween.Alpha(group, 1f, 0.2f, Ease.OutSine);
 ```
+
+UI timers use `Time.unscaledDeltaTime`, never `Time.deltaTime`.
 
 - PrimeTween for ALL UI animation. No Animator controllers for UI.
 - Async sequences use UniTask (PrimeTween's `Tween`/`Sequence` support `await` natively) — no
@@ -162,23 +177,50 @@ a dynamic list is standard pooling practice). Growing past the pre-warmed count 
 and logs a warning so an undersized pool is noticed, not silently tolerated. Use for queue rows, damage
 numbers, technique/item list entries — any dynamic list.
 
-## Prefab-Based Components
+## Prefabs Are the Source of Truth
 
-Every reusable widget is a prefab (View + optional `AnimatedPanel` + theme adapters), bound to an
-element ViewModel at rent time. Style changes to the prefab propagate to every usage. Elements that
-animate frequently should live on their own sub-Canvas (batching).
+**Every piece of the HUD is a prefab, edited like any Unity prefab** (Chains of Contract:
+`Assets/Battle/Prefabs/HUD/*.prefab` per HUD root, widget prefabs beside them). Every reusable widget
+is a prefab too, pool templates included, bound to an element ViewModel at rent time. Elements that
+animate frequently should live on their own sub-Canvas (batching). The user tunes sizes, positions
+and values in the Inspector without code, so:
 
-**Scene and prefab assembly may be done through `u-cli`, but only when the result is then captured
-and shown.** That rule used to read "scene/prefab assembly is the designer's job," which was correct
-while the UI could not be seen — building a hierarchy blind is guessing. With capture available the
-honest version is: assemble, capture, run [design-ref.md](design-ref.md)'s rubric, show the image.
-Structural scene authoring the user wants to own stays theirs; ask rather than assume.
+- **Never rebuild UI from a script.** Builders that recreate hierarchies wipe hand tuning; they are
+  archived (`Design/revamp/builders/archive/`). A large mechanical change may be scripted, but only by
+  loading the prefab (`PrefabUtility.LoadPrefabContents`), changing just what the edit is about, and
+  saving it (`SaveAsPrefabAsset`). See `Design/revamp/builders/README.md`.
+- **Never construct UI at runtime.** `UIWidgetPool` instantiating an authored template is the only
+  runtime `Instantiate`.
+- **One owner per value.** If code must set a rect or size (animation, state), read the rest value
+  from the authored rect (captured in `Awake`) or from one serialized field, never a second copy in
+  code. Example: the minimap rests exactly where its Map rect is authored and restores it when closed.
+- **Every tunable is a serialized field with a `[Tooltip]`** (or a theme value if it's a shared
+  look). No look or timing constants in code.
 
-**Seeing the result is not free.** Screen Space - Overlay UI does not appear in any Edit-mode capture
-— verified, both `capture_game_view --source camera` and `screenshot --view game` return the 3D scene
-with no HUD. Overlay UI needs `capture_game_view --source screen`, which is Play Mode only, via the
-guarded loop in `../u-cli/recipes-ref.md` §4. World Space canvases capture fine in Edit mode. Check
-`RenderMode` before promising a screenshot.
+## The Scene View Shows the Real HUD
+
+The user lays the HUD out in the Scene view and Prefab Mode, so it must look as it does in play:
+
+- **`IEditModePreview`** (`PreviewInEditMode(theme)`, returns whether anything changed): a component
+  that can show its rest look outside Play Mode implements it: themed colours and fonts, seals' fill,
+  a panel that starts hidden authored visible, droplets hidden. It may only set serialized looks —
+  never create material instances, touch services, events or pools. Use `ThemePreview.Tracked(this, …)`
+  to report changes; if a runtime `Apply` isn't Edit-safe (it binds meters, creates instances, depends
+  on data), preview a hand-picked subset instead.
+- **The driver** (`Game.EditorTools.ThemePrefabPreview`) applies previews to the prefabs, widgets
+  before the HUDs that nest them, saving only what changed, on every theme edit and from
+  **Tools > Chains > Apply Theme to HUD Prefabs**. New UI components with a look get a preview.
+- **Sample content**: each pooled list holds a few nested instances of its widget prefab, tagged
+  `EditorOnly`, with `EditModeSample` (removes itself on `Awake` in play). Add samples for new lists.
+- `AnimatedPanel` hides panels at startup, so author them visible. Use the Hierarchy's eye icons to
+  isolate a HUD in the Scene view.
+
+**Verify every change twice.** Edit mode: frame the canvas orthographically in the Scene view and
+`capture_scene_view` (it saves under `Assets/`; move the file out and delete the folder). Play mode:
+Screen Space - Overlay UI needs `capture_game_view --source screen` or a `ScreenCapture` via the
+guarded loop in `../u-cli/recipes-ref.md` §4 — capture every HUD state and pixel-diff it against a
+baseline taken before the change. On Metal, `ScreenCapture` itself logs two "memoryless depth
+surface" warnings: read the console before capturing. Tests and captures both, before calling it done.
 
 ## Events
 
@@ -199,8 +241,10 @@ No `UnityEvent` fields in UI component wiring. Use C# events (ViewModel → View
   all — navigation is an index driven by `IInputSource.Navigate`. State the initial index, the wrap
   behaviour, how unusable entries are skipped, and how the highlight survives pooling. See
   [design-ref.md](design-ref.md).
-- Is anything anchored to a screen edge? Then it needs `Screen.safeArea`. Nothing currently reads it.
-- `CanvasScaler` is already uniform (ScaleWithScreenSize, 1920x1080, match 0). Match it, don't diverge.
+- Is anything anchored to a screen edge? Put it under a `SafeAreaFitter` and keep `ThemeConfig.SafeMargin`.
+- `CanvasScaler` is uniform (ScaleWithScreenSize, 1920x1080, match 1: height). Match it, don't diverge.
+- Does it have a look? Then it previews in the Scene view (`IEditModePreview`), and a pooled list gets
+  samples.
 
 ## Continuous Improvement
 
