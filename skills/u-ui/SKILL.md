@@ -58,7 +58,7 @@ authority, and **the only place a colour is set**. Colour is two layers:
 
 It also holds type (`GetTypeStyle(ThemeFontRole)`: font, material preset, casing, tracking), motion
 (`Snap`, `Strike`, `Bleed`, `Dry` as unscaled-time `TweenSettings`, plus `MieHoldDuration`,
-`CommitHoldDuration`), the meters' `CostPreviewAlpha`, and layout (`GridUnit`, `SafeMargin`).
+`CommitHoldDuration`, `TelegraphHoldDuration`), the meters' `CostPreviewAlpha`, and layout (`GridUnit`, `SafeMargin`).
 `ThemePaletteTests` pins every token's colour; change them only with a deliberate palette change.
 Editing the asset re-applies at once in Edit and Play mode (`ThemeConfig.Edited`).
 
