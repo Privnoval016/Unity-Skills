@@ -134,6 +134,9 @@ Discover with `unity command --tag coc --format json`. Never assume this table i
 | `coc_asset_audit` | Before trusting any ScriptableObject-driven feature. `--type ActionDefinitionSO` etc., or omit for everything under Game/Players/Battle | `u-review` |
 | `coc_validate_actors` | Combat or party work — checks identity fields and gauge maxima on every `CombatActorDefinition` | `u-review` |
 | `coc_hud_report` | Any UI task. Canvas render modes (tells you whether Play Mode is needed to capture), scaler config, navigation coverage | `u-ui/design-ref.md` |
+| `coc_battle_debug` | Play Mode: starting a fight without playing. `--start neutral\|first\|caught` starts one the way F5–F7 do; `--start join` sends the nearest outside hostile into the fight under way | `u-plan` |
+| `coc_battle_probe` | Play Mode: "what state is the fight in?" Context, roster (positions, bounds, gauges), boundary, live camera and every rig's priority, blend, time scale, HUD beats seen | `u-review` |
+| `coc_battle_capture` | Play Mode: a probe JSON (and, unless `--shots false`, a Game view frame) per frame under `Temp/`, optionally starting a fight first. Frames at 4K slow the game; use `--shots false` when timing matters | `u-ui/design-ref.md` |
 | `coc_theme_report` | Any visual work. Resolves `ThemeConfig` tokens, fonts and timings to concrete values so you can see what the theme actually says | `u-ui/design-ref.md` |
 
 **Run the cheap ones before the expensive ones.** `coc_missing_refs` and `coc_asset_audit` answer
