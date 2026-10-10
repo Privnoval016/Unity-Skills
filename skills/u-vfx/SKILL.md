@@ -30,6 +30,8 @@ and what already plays cues. Check the project's hard rules on art sources befor
 | `IVfxInstance` | One pooled instance: `Play(context)`, `Stop(immediately)`, `IsShowing`, `SetStrength`, `SetColour`, `Release` |
 | `VfxCue` (enum) | The moments code can name |
 | `VfxSet` (SO) | An owner's rows of cue → effect, with an optional tint |
+| `VfxParameter` (SO), `VfxValue`, `VfxOverride` | A nameable thing to change, a number / colour / curve / gradient for it, and the pair. Effects list the parameters they answer and what each drives; unanswered ones are ignored |
+| `VfxVariant` (SO) | Another effect with parameters changed and its own lifetime; never a copy of the prefab or graph |
 | `VfxContext` (struct) | Position, rotation, strength 0–1, scale, colour, follow target. Build with `VfxContext.At(...)` or `VfxContext.On(...)` |
 | `IVfxService` | `Play(effect, context)`, `Play(set, cue, context)`, `Prewarm(set)`; returns a `VfxHandle` |
 | `VfxHandle` (struct) | `Stop`, `MoveTo`, `Follow`, `SetStrength`, `SetColour`, `IsPlaying`. A default or stale handle is safe |
@@ -66,6 +68,19 @@ _flight.Stop();
    or the row is missing. Tests run without a service.
 9. Follow `u-style` and `u-arch` as everywhere: no `Find`/`GetComponent` per play, shader and graph
    property ids cached as `static readonly int`, no allocation per play.
+
+## Changing an effect's look
+
+Never duplicate a prefab or a graph to change a colour, a size, a curve or a length.
+
+- One use only: overrides (parameter → value rows) and a duration on the place that plays it.
+- A named, reusable look: a `VfxVariant` asset.
+- While it plays: `handle.Set(parameter, value)`.
+
+A number multiplies the authored size, speed, count or lifetime; colours, curves and gradients replace.
+Every change is undone when the pooled instance is next played, so an instance kind must restore before
+it applies (see `ParticleAuthored`). A new thing to drive on a particle system is one `ParticleField`
+value with its capture, restore and apply; on a graph it is an exposed property and a binding row.
 
 ## Building a VFX Graph effect
 
