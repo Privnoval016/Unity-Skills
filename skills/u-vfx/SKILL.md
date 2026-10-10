@@ -54,15 +54,17 @@ _flight.Stop();
    grows in play is a bug: it warns, and the fix is the effect's `Prewarm`.
 3. **Prewarm = the most that show at once.** Owners prewarm their set when they spawn; scene-wide sets
    go on the service's own list.
-4. **Lifetimes run on game time.** Hitstop and slow motion must hold an effect with its blow. An effect
+4. **A lifetime of 0 means someone holds the handle** and stops it on every way out (end, interrupt,
+   disable). Never play a 0-lifetime effect and drop the handle.
+5. **Lifetimes run on game time.** Hitstop and slow motion must hold an effect with its blow. An effect
    that must keep moving through a freeze is the rare exception and says so on the asset.
-5. **A new moment is a new enum value at the end** of `VfxCue` (never reorder: assets store the
+6. **A new moment is a new enum value at the end** of `VfxCue` (never reorder: assets store the
    number), plus a row in the README's table of what plays it.
-6. **A new kind of effect is a subclass**, with a private nested `IVfxInstance`. If it needs a package,
+7. **A new kind of effect is a subclass**, with a private nested `IVfxInstance`. If it needs a package,
    it lives in the VFX assembly so nothing else references that package.
-7. **Optional by construction.** Every path must do nothing, without error, when the service, the set
+8. **Optional by construction.** Every path must do nothing, without error, when the service, the set
    or the row is missing. Tests run without a service.
-8. Follow `u-style` and `u-arch` as everywhere: no `Find`/`GetComponent` per play, shader and graph
+9. Follow `u-style` and `u-arch` as everywhere: no `Find`/`GetComponent` per play, shader and graph
    property ids cached as `static readonly int`, no allocation per play.
 
 ## Building a VFX Graph effect
@@ -93,8 +95,11 @@ The graph kind drives any graph through fixed names, so a graph needs no script 
   small ones. Trim the quad to the texture (octagon output), keep alpha low-area, shorten lifetimes.
 - **Instancing.** Many copies of the same graph are batched if the asset allows instancing (on by
   default). Exposed textures and meshes that differ per instance break the batch.
-- **First use.** A graph's shaders compile the first time it draws. Prewarming the pool at load puts
-  that cost in the load, which is the reason prewarm is not optional.
+- **First use.** Prewarming makes the instances at load (the graph kind keeps each one's GPU buffers
+  while it waits in the pool). It does not draw them: a graph's shaders still compile the first time it
+  is seen. If that shows as a spike, show the effect once during load.
+- **Fade Seconds** on the asset is the longest particle life in the graph. The live-particle count is
+  read back from the GPU only about once a second, so it is not used to tell when a graph has finished.
 - **Fixed time step.** VFX Graph simulates on its own step (Project Settings → VFX). Fast, short effects
   can stutter at a low step; keep the default unless a capture shows a problem.
 
@@ -110,8 +115,9 @@ Both are played the same way, so the choice is per effect and can change later.
 ## Building a particle effect
 
 - The prefab's root is the particle system; children are played and stopped with it.
-- `Play On Awake` off; `Stop Action` None (the pool takes it back, it must not disable or destroy
-  itself); `Scaling Mode` Hierarchy so strength and scale apply.
+- `Play On Awake` off, `Stop Action` None and `Scaling Mode` Hierarchy are forced on every system as an
+  instance is made, so a bought effect that destroys itself cannot break the pool.
+- It is simulated one frame at birth, so a burst shows on the frame of a blow that hitstop freezes.
 - `Max Particles` set to what the effect needs, for the same reason as a graph's capacity.
 - `Culling Mode` Always Simulate only for effects whose timing matters off screen; otherwise Automatic.
 - Colour is taken through the main module's start colour only when the asset says the effect takes one.
@@ -137,7 +143,8 @@ Timeline's own **Control Track**.
 - [ ] No `Instantiate`/`Destroy` of effects in play; `Prewarm` covers the most at once
 - [ ] Lifetime set; a 0-lifetime effect has an owner that stops its handle on every exit path
 - [ ] Graph: capacity fits, bounds set by hand, `OnPlay`/`OnStop` wired, optional properties named exactly
-- [ ] Particle prefab: Play On Awake off, Stop Action None, Max Particles fits
+- [ ] Graph asset: Fade Seconds covers the longest particle life
+- [ ] Particle prefab: Max Particles fits
 - [ ] Nothing breaks with no service, no set or no row
 - [ ] New cue appended to the enum and listed in the README
 
