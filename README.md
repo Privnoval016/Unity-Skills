@@ -84,6 +84,7 @@ loaded as skills themselves (`install.sh` only links `skills/*/`). See `vendor/R
 | `/u-input` | Yes | IInputSource abstraction, typed buttons, grace windows |
 | `/u-physics` | Yes | Orchestrated physics, context reuse, modifier pipeline |
 | `/u-ui` | Yes | ThemeConfig adapters, modular UI, PrimeTween, visual design, UI Toolkit |
+| `/u-vfx` | Yes | Effects as assets, cue + owner's set, pooled service, VFX Graph and particle practice |
 | `/u-cli` | Yes | Driving the live Editor: captures, console, tests, scene diffs, project verbs |
 | `/u-review` | Manual only | Full code review → ReportFindings (user-invoked) |
 | `/u-plan` | Manual only | Planning assistant — thorough Q&A before any implementation |
