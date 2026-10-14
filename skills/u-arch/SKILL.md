@@ -97,7 +97,7 @@ have that capability implement it.
 A concrete worked example from `Assets/CombatEngine`: `ITurnAction` is implemented by
 `TechniqueAction`, `ItemAction`, `SkipTurnAction`, `JointTechniqueAction`, and others. Not all of
 them have an owner, a resource cost, or a Joint Technique priority — `SkipTurnAction` has none of
-the three; the harness's `OwnedTurnAction` wrapper has all three. Rather than bloating `ITurnAction`
+the three; an owned technique has the first two. Rather than bloating `ITurnAction`
 with `Owner`/`CostResource`/`CostAmount`/`JointPriority` fields that most implementers would have to
 either fake or ignore, each became its own interface — `IOwnedTurnAction`, `ICostedTurnAction`,
 `IJointTechniqueParticipant` — implemented only by whichever classes genuinely have that concept.
@@ -141,25 +141,44 @@ when a specific actor is defeated" or "expires when a named status is removed el
 reuses the identical generic class with a different `TEvent` and predicate, not a parallel
 `DefeatScopedDuration` written from scratch.
 
-### Checking for an optional capability interface via `is` is fine — checking a concrete type is not
+### No type checks in game logic
 
-The project's usual rule against type-checking (`is`/pattern matching used to branch on what
-something *is* rather than trusting polymorphism) still holds for **concrete types** — checking
-`is SomeConcreteClass` to decide behavior breaks encapsulation and should be avoided, same as
-always.
+Branching on what something *is* (`is`, `as`, `OfType<T>`, `GetType()`, a `switch` on type) is a
+code smell: it is logic that must be found and edited whenever a subtype is added, and it fails
+silently when one is missed. The owner's rule (2026-10-13) is that game logic contains none.
 
-But checking `is ISomeCapability` for one of these optional capability interfaces is a *different*,
-acceptable category — it's the same shape as `TryGetComponent<T>` in an ECS-style system, or
-checking `is IDisposable` before calling `Dispose()`. You're not asking "what concrete class is
-this", you're asking "does this thing support this specific, narrow contract" — which is trusting a
-(narrower) interface contract, not bypassing one. `JointTechniqueAction` reads
-`IOwnedTurnAction`/`ICostedTurnAction`/`IJointTechniqueParticipant` this way when scanning
-`CombatContext.ActionCatalog`, defaulting sensibly (unowned, free, default priority) when an action
-doesn't implement one — that's the intended usage pattern for these interfaces, not a workaround.
+| What you were about to write | Write this instead |
+|---|---|
+| `if (x is ConcreteA) … else if (x is ConcreteB)` | A virtual or interface member each subtype answers |
+| `(x as Concrete).Member` (a downcast to reach something) | Move the member up to the declared type, with a default if most do nothing |
+| A `switch` over a family to describe or display it | The object carries its own key and values; the reader looks the key up in a table |
+| `x.GetType().Name` as a label | A `Label` member |
+| A member most implementers would fake | A narrow optional interface (above), asked for through **one named lookup** |
 
-The rule was never "never use `is`" — it's "never branch on a concrete implementation type instead
-of trusting the interface contract." Checking for an optional capability interface *is* trusting a
-contract, just a narrower one than the base interface.
+**Optional capabilities are asked through one lookup, never a bare `is`.** A narrow optional
+interface is still the right shape for a member most implementers lack; what changed is how it is
+asked for. A bare `x is ICapability` sees only the outermost object, so it breaks the moment the
+object is wrapped, and it scatters the check. Give each family one lookup and use it everywhere.
+Worked example: a fight's actions wear decorators (`OwnedAction`, `AuthoredAction`,
+`VariantAction`), each implementing `IActionDecorator { ITurnAction Inner }` and forwarding only the
+five members of `ITurnAction`; code asks `action.Capability<ICostedTurnAction>()`, which walks the
+wrappers and returns the first that has it or null. A new wrapper never forwards a capability and a
+new capability never touches a wrapper. Before this, three wrappers each re-declared cost, preview,
+description and ten targeting members, and four direct `is` checks silently returned nothing for a
+wrapped action until a guard test (`ActionCapabilityGuardTests`, which scans the source) caught them.
+When you clear a family of type checks, add or extend such a guard so it cannot regress.
+
+**Where a type check stays:** casts the engine's own APIs force (`transform as RectTransform`,
+Timeline tracks and bindings, Animancer states, Input System devices, Editor `target as X`), generic
+registries keyed by type (a service locator, an event bus), `Equals(object)`, the one lookup helper
+itself, and tests.
+
+**Before adding a type named after one character, technique or use**, find the general mechanism:
+the owner's rule is that a character's mechanic is never an engine concept if a general one will
+do. Worked example: Byakuza's stances were built with no stance type: a stance is a status that
+lasts until removed, changing it is two ordinary effects, a starting stance is a passive, and a
+technique's two forms are rows of conditions on its user (`VariantAction`), the same conditions the
+stat pipeline already used.
 
 ## Namespace Scope
 
