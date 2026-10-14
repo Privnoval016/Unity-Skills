@@ -165,7 +165,7 @@ five members of `ITurnAction`; code asks `action.Capability<ICostedTurnAction>()
 wrappers and returns the first that has it or null. A new wrapper never forwards a capability and a
 new capability never touches a wrapper. Before this, three wrappers each re-declared cost, preview,
 description and ten targeting members, and four direct `is` checks silently returned nothing for a
-wrapped action until a guard test (`ActionCapabilityGuardTests`, which scans the source) caught them.
+wrapped action until a guard test (`TypeCheckGuardTests`, which scans the source) caught them.
 When you clear a family of type checks, add or extend such a guard so it cannot regress.
 
 **Where a type check stays:** casts the engine's own APIs force (`transform as RectTransform`,

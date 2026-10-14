@@ -69,41 +69,34 @@ public interface IAnimationSource
 }
 ```
 
-Optional capabilities layer on top as narrow, single-purpose interfaces — implement only the ones
-that apply, exactly the same "no hanging fields" shape used elsewhere in the codebase:
+What only some sources do is a member of `IAnimationSource` with a do-nothing default, so the driver
+never asks what kind of source it holds (u-arch: no type checks in game logic):
 
-- `ISingleAxisBlendSource : IAnimationSource` — `void SetBlend(AnimancerState state, float value)`,
-  for a source whose blend position is one float set every frame (`BlendTree1DSource`).
-- `IPlanarBlendSource : IAnimationSource` — `void SetBlend(AnimancerState state, Vector2 value)`, for
-  a directional (right, forward) blend set every frame (`BlendTree2DSource` — the strafe blend).
-- `IReleasableAnimationSource : IAnimationSource` — `AnimancerState Release(...)`, for a source with a
-  distinct exit phase that must be explicitly ended (`StartLoopEndSource`: a start clip hands off to a
-  looping sustain clip, which plays until `Release()` plays the end clip — covers a charge-up held
-  until the button releases).
+- `void Drive(AnimancerState state, in LocomotionParams parameters)`: keeps a state the source made in
+  step with how the body moves. `BlendTree1DSource` sets its one float from planar speed;
+  `BlendTree2DSource` sets its (right, forward) blend from local planar velocity. Nothing by default.
+- `bool Releases` and `AnimancerState Release(...)`: a source with a distinct exit phase that must be
+  played before the next one starts (`StartLoopEndSource`: a start clip hands off to a looping sustain
+  clip, which plays until `Release()` plays the end clip; covers a charge-up held until the button
+  releases). False and null by default.
+- `AnimationClip ReferenceClip`: the one clip a source plays, for whatever needs its length or its
+  events (an attack's timing). Null for a source that is not a single clip.
 
 Concrete implementations, all `[Serializable]`, all embedded directly via `[SerializeReference]`:
 `SingleClipSource` (one `ClipTransition`, the common case), `BlendTree1DSource` (`LinearMixerTransition`),
 `BlendTree2DSource` (`MixerTransition2D`), `StartLoopEndSource` (three `ClipTransition`s: start/loop/end).
 
-Add a new animation shape by implementing `IAnimationSource` (+ an optional capability interface if it
-needs blending or a release phase) — never by adding a new field to an existing source type.
+Add a new animation shape by implementing `IAnimationSource` and overriding whichever of those members
+it has an answer for; never by adding a field to an existing source type or a type check to the driver.
 
 ## Blend Parameters: Direct Method Calls, Not Named Animancer Parameters
 
-Blending is driven by the caller invoking a resolved source's own `SetBlend` every frame, **not** by
+Blending is driven by the caller handing the active source this frame's parameters, **not** by
 looking up a named Animancer `Parameter`/`StringAsset`:
 
 ```csharp
-// Correct — the driver knows the concrete blend-capable source type it just played
-switch (_activeLocomotionSource)
-{
-    case IPlanarBlendSource planar:
-        planar.SetBlend(_locomotionState, new Vector2(parameters.LocalPlanarVelocity.x, parameters.LocalPlanarVelocity.z));
-        break;
-    case ISingleAxisBlendSource single:
-        single.SetBlend(_locomotionState, parameters.PlanarSpeed);
-        break;
-}
+// Correct: the source knows what to do with them (or does nothing)
+_activeLocomotionSource?.Drive(_locomotionState, parameters);
 
 // Wrong — this project doesn't use named-parameter/StringAsset-keyed Animancer parameters at all
 animancer.Parameters.GetOrCreate<float>("moveSpeed");
@@ -171,8 +164,7 @@ by the driver. A driver with no animator (a debug visual) simply doesn't impleme
 - Is this character animation (Animancer) or UI animation (PrimeTween)?
 - What locomotion/ability modes does this need a source for? Does the movement state machine
   (`PawnStateFactory`) already have a matching state, or does this need a new one?
-- Does it need blending (`ISingleAxisBlendSource`/`IPlanarBlendSource`) or a release phase
-  (`IReleasableAnimationSource`)?
+- Does it need blending (`Drive`) or a release phase (`Releases`, `Release`)?
 - Is the selection logic for this a pure function of instantaneous physics values, or does it need
   its own timed/stateful resolver (like `LandingRecovery`)?
 - Is this universal (every character gets it — a new `AnimationConfig` field) or character-specific
