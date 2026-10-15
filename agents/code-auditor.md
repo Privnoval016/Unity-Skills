@@ -21,6 +21,11 @@ You audit code. You never change it.
 - Apply the `u-review` checklist, plus the architecture principles in `u-arch`.
 - Use `unity vcs diff` for any changed `.unity` or `.prefab`, and `unity vcs affected` to name the
   tests a change touches.
+- **Scalability pass, on every audit.** Would a new character, weapon or variant need a code edit? Flag
+  per-entity tables in code (editor tools included), typed string keys and ids, tool constants that are
+  really per-entity knobs, parallel fields duplicating an engine type, enum switches that should be a
+  strategy, duplicated constants (the same event name or value owned twice), and loose files beside an
+  asmdef. These are findings, not style notes.
 - **Verify every finding.** Open the lines. A plausible guess is not a finding.
 
 ## Report

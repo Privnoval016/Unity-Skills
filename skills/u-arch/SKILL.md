@@ -197,6 +197,21 @@ Namespaces section for the full rule and reasoning.
 - `OnValidate()`: derive low-level constants from designer-friendly inputs. Derived = `[HideInInspector]`.
 - `[FormerlySerializedAs("oldName")]` on renamed fields to preserve existing asset data.
 - Enums for categorization only. `[SerializeReference]` + interface when type choice implies behavior.
+- **One asset per thing, never a table of things in code.** Per-character (per-enemy, per-weapon) data
+  is an asset beside what owns it, read by one general tool or system. Adding a character must mean a
+  new asset, not a code edit. Editor tooling counts: a builder holding every character's rows in a C#
+  array is the same mistake as a runtime one.
+- **No typed keys.** An Inspector reference is an asset or a dropdown of what exists (Odin
+  `ValueDropdown` over the real choices). An id that only links two things a tool writes itself is a
+  private constant, never a field. A name that follows from structure is derived (a chain's step is
+  `Light_2`), not typed.
+- **Knobs are data; reuse the engine's own types.** A value a designer might want different per
+  character (aim, timing shares, buffer seconds, fall limits) lives on the data, not as a tool's
+  constant. Where the engine already has a type for it (`AimProfile`, `HitSpec`, `SocketDefinition`),
+  hold that type rather than parallel fields.
+- **A behaviour that varies is a strategy, not a switch.** Two ways of doing a thing (a blade window, a
+  bow release, a landing burst) are implementations of one interface on the data, so a third needs no
+  edit to the code that uses them.
 
 ## Performance (global — applies everywhere, always)
 
