@@ -141,6 +141,18 @@ instead of freezing at whatever shipped first.
 
 Save the plan to `.claude/plans/<kebab-case-feature-name>.md`.
 
+### Refactor plans
+
+A refactor plan is a different kind of plan: it changes structure and no behaviour. Refactor does not
+mean rewrite. Follow `../u-arch/refactoring-ref.md` ("How a refactor is done") and add to the plan:
+
+- **Invariant**: what must not change, and how it is pinned (named tests, a before/after snapshot of
+  data such as asset values, stat bases or references).
+- **Steps**: new shape beside the old, callers moved in groups, a script for serialized data, the old
+  shape deleted last; build and tests green after each step.
+- **Smells addressed**: each one named, with its remedy.
+- No feature or balance change in the same commits; list any found as separate follow-ups.
+
 ---
 
 ## Step 4: ExitPlanMode

@@ -235,17 +235,59 @@ Decisions that hold across projects. Do not propose the alternative.
   `NavMesh.CalculatePath`, or the `com.unity.ai.navigation` package, and do not reach for the
   Pipeline package's `bake_navmesh*` commands. If a task needs pathfinding, it needs A\*.
 
+## Code Smells
+
+A smell is a sign a design will resist the next change. Each has a standard remedy; the full table,
+in this codebase's form, is in [refactoring-ref.md](refactoring-ref.md). Watch for these in particular:
+
+- **Bloaters:** long methods, long parameter lists (more than 3, or a group passed through several
+  calls: a `readonly struct` parameter object), data clumps, primitive obsession (`object`, raw ids,
+  typed keys), large classes edited for unrelated reasons.
+- **Change preventers:** shotgun surgery (one new character, element or resource edits several
+  files: move the knowledge to data), divergent change, parallel hierarchies.
+- **Dispensables:** dead code, speculative generality (a hook, virtual or parameter nobody calls),
+  lazy classes and middle men, narrating comments, duplicates.
+- **Couplers:** feature envy, inappropriate intimacy, message chains of three or more owners.
+- **Others:** a switch on a kind that new content must edit (a strategy), a query that also mutates
+  (split `Preview` from `Apply`), a flag parameter (two methods), null checks repeated for an optional
+  behaviour (a no-op default; never for required wiring).
+
+Exempt by design: strategies reading their context, config SOs and event structs as data,
+thin facades and adapters, a local exhaustive switch over a closed category.
+
+## When to Refactor
+
+- **Before a feature**, when the code's shape makes the feature awkward; **on a bug**, when the bug
+  came from the shape; **on review**. Never as a rewrite.
+- **Rule of three for structure** (a helper, an abstraction). Hardcoded tuning, typed keys, `object`
+  identities and type checks are fixed the first time.
+- **A refactor changes no behaviour**, and ships apart from features and balance changes. State the
+  invariant, pin it with tests and a before/after snapshot, add the new shape beside the old, migrate
+  by script, delete the old. Steps in [refactoring-ref.md](refactoring-ref.md).
+- **Serialized shape is data.** Renaming a field, or a `[SerializeReference]` type, namespace or
+  assembly, breaks assets silently unless it carries `[FormerlySerializedAs]` / `[MovedFrom]` or a
+  migration script, checked by a snapshot diff.
+
 ## Design Patterns
 
 For full Unity-specific examples see [patterns-ref.md](patterns-ref.md).
+
+- **Use a pattern only against a problem present today** (a second implementation, a designer
+  choice, a real coupling). A pattern for a variation nobody has asked for is speculative generality.
+- **Choose by intent:** behaviour that varies → Strategy; things to notify → Observer; modes →
+  State; a choice of what to create → Factory; requests to queue, buffer or replay → Command; many
+  parts talking → Mediator; trees of rules → Composite; ordered handlers → Chain of Responsibility;
+  a library behind our interface → Adapter; layers that wrap a value → Decorator.
 
 **Reach for these first:**
 Strategy · Observer · State (PushdownAutomata) · Factory · Command · Mediator · Composite (ICondition)
 
 **Use when the problem fits:**
-Chain of Responsibility · Adapter · Template Method · Decorator · Builder · Facade
+Chain of Responsibility · Adapter · Template Method · Decorator · Builder · Facade · Flyweight
 
-**Avoid:** Singleton (Service Locator instead) · Heavy DI containers
+**Avoid:** Singleton (Service Locator instead) · Heavy DI containers · Visitor (a member on the
+declared type or a strategy instead) · ambient static state, except a scoped one that restores itself
+(`using` scope) with a test proving it does
 
 ## Continuous Improvement
 

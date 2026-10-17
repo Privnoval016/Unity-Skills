@@ -105,6 +105,9 @@ For multi-layer character controllers needing async transitions:
 - Do states need to carry SO data (attack config, ability config)?
 - Is there an AI brain driving state selection, or purely input-driven?
 - Does the base state (e.g. locomotion) need `doNotRemove = true`?
+- Is this really several states, or one behaviour with a value that changes? A bool or an enum read in
+  a few places is not a state machine; a `switch` on mode repeated across methods is the sign it is.
+- Does each state own its own enter, exit and per-tick work, with no other state reaching into it?
 
 ## Continuous Improvement
 

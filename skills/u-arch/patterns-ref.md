@@ -32,6 +32,10 @@ Defines a one-to-many dependency so that when one object changes state, all depe
 **When to use:** EventBus for cross-system broadcast; C# events for same-system coupling.
 Always `Register` in `OnEnable`, `Deregister` in `OnDisable`.
 
+**Order is not a contract.** Subscribers run in registration order, which nobody controls. If one
+handler must run before another (a relay before a presentation), make it one ordered stage list or
+an explicit call, not two subscriptions.
+
 ---
 
 ### State (PushdownAutomata)
@@ -62,6 +66,8 @@ Encapsulates requests as objects, allowing parameterization, queuing, and undo.
 - Input buffer: `CombatInputBuffer` stores typed button events with timestamps for deferred processing
 - Ability phases: `IPipelineStep` / `IAbilityPhase` — each phase is an encapsulated action
 - Game state transitions: typed request objects submitted to an orchestrator buffer per-tick
+- Turn actions: `ITurnAction` is a request the simulation carries out (`CarryOutAsync`), so the same
+  action can be chosen, previewed, inserted out of turn or replayed
 
 **When to use:** input with grace windows; ability execution pipelines; undoable actions.
 
@@ -92,11 +98,15 @@ Treats individual objects and compositions of objects uniformly.
 ### Chain of Responsibility
 Passes requests along a chain of handlers until one handles it.
 
-**Unity form:** motion pipeline stages / `IMotionStage` — each stage reads the context and modifies
-velocity or state. Orchestrator runs them in priority order. A stage can short-circuit by marking
-the request consumed.
+**Unity forms:**
+- Motion pipeline stages / `IMotionStage` — each stage reads the context and modifies velocity or
+  state. Orchestrator runs them in priority order. A stage can short-circuit by marking the request
+  consumed.
+- Blow stages / `IBlowStage` — `CombatContext.Strike` runs guards, then technique defence, then a
+  real-time hit's own guard; the first to answer the blow decides it.
 
 **When to use:** multi-step processing pipelines (physics, damage calculation, AI decision trees).
+State the order in one place (a priority or an ordered list), never by registration order.
 
 ---
 
@@ -129,7 +139,21 @@ Attaches additional responsibilities to an object dynamically.
 **Unity form:** Extensions Modifiers system — each `IModifierStrategy` wraps the base stat query and
 adds behavior (multiply speed, clamp range, add flat bonus) without subclassing or modifying base classes.
 
+**Also:** `ElementalScale` wraps a blow's amount with the dealer's dealt and the target's taken stat
+for its element, without the damage formula knowing elements exist.
+
 **When to use:** runtime-composable behavior on top of existing objects (buffs, status effects, equipment).
+
+---
+
+### Flyweight
+Shares the unchanging part of many objects so each instance holds only its own state.
+
+**Unity form:** ScriptableObject definitions (`TechniqueDefinition`, `StatusEffectDefinition`,
+`StatDefinition`) shared by every fighter that uses them; the runtime instance holds only per-fighter
+state (stacks, remaining turns, cooldowns). Never copy a definition's data into each instance.
+
+**When to use:** many runtime objects built from the same authored data.
 
 ---
 
@@ -162,3 +186,6 @@ Provides a simplified interface to a complex subsystem.
 | **Singleton** | Hard to test, hides dependencies, pollutes global state | `Services.Get<T>()` |
 | **Heavy DI (Zenject)** | Complexity without proportional benefit for game projects | Constructor injection + `ServiceBootstrapper` |
 | **Service Locator as a crutch** | Can hide poor architecture if overused | Prefer direct injection at composition roots |
+| **Visitor** | Needs type dispatch and edits every visitor for a new type | A member on the declared type, or a strategy |
+| **Ambient static state** | Leaks between tests and fights | Pass it in; or a scoped static that restores itself on dispose, with a test |
+| **A pattern with one implementation and no second in sight** | Speculative generality: indirection with no payoff | The plain class; extract the interface when the second case arrives |

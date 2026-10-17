@@ -23,6 +23,8 @@ For extended examples and templates see [style-ref.md](style-ref.md).
 - Extended doc tags: `<para>`, `<list type="number/bullet">`, `<typeparam>`, `<param>`,
   `<returns>`, `<remarks>`, `<see cref="..." />`.
 - **No inline comments** (`// ...`) anywhere. If logic needs explanation, extract a named method.
+- **A doc comment states the contract**: what it does, returns, requires and throws. A comment that
+  explains *how* the code works is the "comments" smell: rename or extract until it is unneeded.
 
 **Class-level summaries stay high-level.** One or two complete sentences describing what the class
 *is* and its role — not a design-rationale excerpt. Skip the "why" (a past alternative considered,

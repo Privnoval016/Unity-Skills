@@ -32,6 +32,12 @@ You audit code. You never change it.
   and hardcoded strings naming input actions, assets or ids. A code constant is acceptable only as an
   engine safety limit, named and documented. Also flag fully qualified names where a `using` would do.
   These are findings to fix, not notes.
+- **Smells pass, on every audit.** Read `u-arch/refactoring-ref.md`. Name each smell you find (long
+  method, long parameter list, data clump, primitive obsession, large class, switch on a kind, dead
+  code, speculative generality, middle man, feature envy, message chain, query that mutates, flag
+  parameter, duplication) and give its remedy in this codebase's form. Respect u-arch's exemptions.
+- **Viewpoint.** When the lead gives you one of the `u-review/reviewers.md` briefs, follow it and
+  keep to its checklist sections; pass anything else along in one line.
 - **Verify every finding.** Open the lines. A plausible guess is not a finding.
 
 ## Report
