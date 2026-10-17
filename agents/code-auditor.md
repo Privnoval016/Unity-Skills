@@ -26,6 +26,12 @@ You audit code. You never change it.
   really per-entity knobs, parallel fields duplicating an engine type, enum switches that should be a
   strategy, duplicated constants (the same event name or value owned twice), and loose files beside an
   asmdef. These are findings, not style notes.
+- **Types and values pass, on every audit.** Flag `object`-typed members used as identities, owners,
+  tokens or bags (they need a named sealed type or a marker interface), and arbitrarily hardcoded values:
+  any gameplay or tuning number, name or limit in code that belongs in data (a stat, a config, an asset),
+  and hardcoded strings naming input actions, assets or ids. A code constant is acceptable only as an
+  engine safety limit, named and documented. Also flag fully qualified names where a `using` would do.
+  These are findings to fix, not notes.
 - **Verify every finding.** Open the lines. A plausible guess is not a finding.
 
 ## Report
