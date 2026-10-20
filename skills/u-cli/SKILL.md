@@ -137,7 +137,7 @@ Discover with `unity command --tag coc --format json`. Never assume this table i
 | `coc_battle_debug` | Play Mode: starting a fight without playing. `--start neutral\|first\|caught` starts one the way F5–F7 do; `--start join` sends the nearest outside hostile into the fight under way | `u-plan` |
 | `coc_battle_probe` | Play Mode: "what state is the fight in?" Context, roster (positions, bounds, gauges), boundary, live camera and every rig's priority, blend, time scale, HUD beats seen | `u-review` |
 | `coc_battle_capture` | Play Mode: a probe JSON (and, unless `--shots false`, a Game view frame) per frame under `Temp/`, optionally starting a fight first. Frames at 4K slow the game; use `--shots false` when timing matters | `u-ui/design-ref.md` |
-| `coc_session_probe` | Play Mode: what the game session holds: quests and steps, set flags, unlocked Joint Attacks, play time, the last save or load. `coc_session_new`, `coc_session_save --slot`, `coc_session_load --slot`, `coc_session_autosave` and `coc_session_list` act on it (saves and loads finish in the background; probe again) | `u-review` |
+| `coc_session_probe` | Play Mode: what the game session holds: quests and steps, set flags, everything unlocked, play time, the last save or load. `coc_session_new`, `coc_session_save --slot`, `coc_session_load --slot`, `coc_session_autosave` and `coc_session_list` act on it (saves and loads finish in the background; probe again) | `u-review` |
 | `coc_theme_report` | Any visual work. Resolves `ThemeConfig` tokens, fonts and timings to concrete values so you can see what the theme actually says | `u-ui/design-ref.md` |
 
 **Run the cheap ones before the expensive ones.** `coc_missing_refs` and `coc_asset_audit` answer
