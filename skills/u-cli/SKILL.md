@@ -139,6 +139,7 @@ Discover with `unity command --tag coc --format json`. Never assume this table i
 | `coc_battle_capture` | Play Mode: a probe JSON (and, unless `--shots false`, a Game view frame) per frame under `Temp/`, optionally starting a fight first. Frames at 4K slow the game; use `--shots false` when timing matters | `u-ui/design-ref.md` |
 | `coc_session_probe` | Play Mode: what the game session holds: quests and steps, set flags, everything unlocked, play time, the last save or load. `coc_session_new`, `coc_session_save --slot`, `coc_session_load --slot`, `coc_session_autosave` and `coc_session_list` act on it (saves and loads finish in the background; probe again) | `u-review` |
 | `coc_theme_report` | Any visual work. Resolves `ThemeConfig` tokens, fonts and timings to concrete values so you can see what the theme actually says | `u-ui/design-ref.md` |
+| `coc_shader_users` | Before changing any shader or shader include. `--shader "Chains/UI/Brush Stroke"` (or a `.shader` / `.hlsl` path) lists its materials, the scenes, prefabs and assets using them, and code naming it; for an include, every shader including it | `u-review` |
 
 **Run the cheap ones before the expensive ones.** `coc_missing_refs` and `coc_asset_audit` answer
 "is this a bug?" without entering Play Mode, and that is the first question in `design-ref.md`'s
