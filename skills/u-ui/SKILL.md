@@ -242,9 +242,30 @@ No `UnityEvent` fields in UI component wiring. Use C# events (ViewModel → View
   behaviour, how unusable entries are skipped, and how the highlight survives pooling. See
   [design-ref.md](design-ref.md).
 - Is anything anchored to a screen edge? Put it under a `SafeAreaFitter` and keep `ThemeConfig.SafeMargin`.
-- `CanvasScaler` is uniform (ScaleWithScreenSize, 1920x1080, match 1: height). Match it, don't diverge.
+- `CanvasScaler` is uniform: ScaleWithScreenSize, 1920x1080, **Expand** (the reference always fits: a wider screen
+  gains width, a narrower one height). Match it on every new canvas, don't diverge. See *Screen shapes* below.
 - Does it have a look? Then it previews in the Scene view (`IEditModePreview`), and a pooled list gets
   samples.
+
+## Screen shapes (16:10, 21:9, 4:3)
+
+Design and capture at 16:9; make it hold elsewhere by construction, not by a screenshot sweep.
+
+- **HUD-style canvases** (the battle HUD): Expand scaling plus anchors does it. Anchor every region to the corner or
+  edge it belongs to (under a `SafeAreaFitter`), never place it by a centre offset that assumes 1920 across. On a
+  narrower screen Expand scales the canvas down so the 1920 width fits; on a wider one regions spread to their
+  corners. Check that two regions anchored to opposite corners can't meet at 1920 wide.
+- **Composed screens** (the menu): the layout is held at 16:9 in a centred 1920 × 1080 `Frame` under the canvas and
+  the screens anchor inside it; what must keep to the screen's own edges (the prompt bar, the watermark) sits in a
+  `ScreenEdges` rect that reaches them on chosen sides. Anything drawn in 3D behind it maps through `FrameSpace`
+  (frame units held at 16:9; `Visible`/`Reach` say what the screen shows around the frame; the camera's
+  `HoldingFov` keeps the frame's width on a narrower screen). Surfaces laid across the frame build out to `Reach`,
+  never to a fixed overscan.
+- **To look at a shape** when a change could matter: `UnityEditor.PlayModeWindow.SetCustomRenderingResolution(w, h,
+  name)` through `unity command eval`, then the usual play capture; set it back to 1920 × 1080 after. A quick spot
+  check at 4:3 (the narrowest) and 21:9 (the widest) is enough; tests pin layout maths at those shapes
+  (`FrameSpaceTests`, `ScreenEdgesTests`).
+- A test that measures layout must pin its camera's `aspect` (the headless CI runner's window is not 16:9).
 
 ## Continuous Improvement
 
