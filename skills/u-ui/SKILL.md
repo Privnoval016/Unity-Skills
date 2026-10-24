@@ -180,7 +180,7 @@ numbers, technique/item list entries — any dynamic list.
 ## Prefabs Are the Source of Truth
 
 **Every piece of the HUD is a prefab, edited like any Unity prefab** (Chains of Contract:
-`Assets/Battle/Prefabs/HUD/*.prefab` per HUD root, widget prefabs beside them). Every reusable widget
+`Assets/Battle/Prefabs/HUD/<moment>/*.prefab` per HUD root, widget prefabs in `Assets/Battle/Prefabs/<piece>/`). Every reusable widget
 is a prefab too, pool templates included, bound to an element ViewModel at rent time. Elements that
 animate frequently should live on their own sub-Canvas (batching). The user tunes sizes, positions
 and values in the Inspector without code, so:
