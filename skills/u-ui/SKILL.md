@@ -204,8 +204,9 @@ The user lays the HUD out in the Scene view and Prefab Mode, so it must look as 
 - **`IEditModePreview`** (`PreviewInEditMode(theme)`, returns whether anything changed): a component
   that can show its rest look outside Play Mode implements it: themed colours and fonts, seals' fill,
   a panel that starts hidden authored visible, droplets hidden. It may only set serialized looks —
-  never create material instances, touch services, events or pools. Use `ThemePreview.Tracked(this, …)`
-  to report changes; if a runtime `Apply` isn't Edit-safe (it binds meters, creates instances, depends
+  never create material instances, touch services, events or pools. An adapter whose rest look is just its
+  `Apply` derives from the project's previewed adapter base (here `PreviewedThemeAdapter`) instead of writing
+  the preview; otherwise use `ThemePreview.Tracked(this, …)` to report changes. If a runtime `Apply` isn't Edit-safe (it binds meters, creates instances, depends
   on data), preview a hand-picked subset instead.
 - **The driver** (`Game.EditorTools.ThemePrefabPreview`) applies previews to the prefabs, widgets
   before the HUDs that nest them, saving only what changed, on every theme edit and from

@@ -29,7 +29,9 @@ Ask before proposing any new class:
 - Generic class needing Unity Update loop → `MonoBehaviourUpdatable`
 - Smooth spring following (camera, UI) → `SODEvaluator` / `SecondOrderDynamics`
 - Ring buffer → `CircularList<T>`
-- Framerate-independent smooth → `EaseUtil.Damp`
+- Framerate-independent smooth → `EaseUtil.Damp`, an angle → `EaseUtil.DampAngle`
+- "Does this list hold this exact object?" without allocating → `CollectionUtil.Has` (reference equality)
+- Editor: assets of a type, the first one, a folder and its parents → `AssetQuery.All` / `First` / `EnsureFolder`
 - Transform / math helpers → `TransformUtil`, `MathUtil`, `TweenUtil`, `AudioUtil`, `EaseUtil`
 
 ## If the Utility Already Exists
