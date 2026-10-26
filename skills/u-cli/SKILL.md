@@ -123,6 +123,9 @@ via `TypeCache` and appear in `unity command` after a recompile. Four rules keep
 - **Promote on repetition.** When a primitive sequence runs a third time, or a plan step names a
   sequence with no verb, stop and propose a new `[CliCommand]`. This is what makes the set compound
   instead of freezing at whatever shipped first.
+- **One answer shape.** Every verb fails the same way and rounds its numbers the same way, through
+  one helper (here `CocAnswers`: `Playing`, `NotPlaying`, `Failed(error)`, `Round(value, digits)`).
+  Never write the failure object or the rounding by hand in a verb.
 
 ### This project's verbs, and when to reach for each
 
@@ -137,6 +140,7 @@ Discover with `unity command --tag coc --format json`. Never assume this table i
 | `coc_battle_debug` | Play Mode: starting a fight without playing. `--start neutral\|first\|caught` starts one the way F5–F7 do; `--start join` sends the nearest outside hostile into the fight under way | `u-plan` |
 | `coc_battle_probe` | Play Mode: "what state is the fight in?" Context, roster (positions, bounds, gauges), boundary, live camera and every rig's priority, blend, time scale, HUD beats seen | `u-review` |
 | `coc_battle_capture` | Play Mode: a probe JSON (and, unless `--shots false`, a Game view frame) per frame under `Temp/`, optionally starting a fight first. Frames at 4K slow the game; use `--shots false` when timing matters | `u-ui/design-ref.md` |
+| `coc_aim_at` | Play Mode, an aim screen open (ground, line or cone): puts its point at `--actor`'s feet (an object name) or at `--x`/`--z`, kept in range as the stick keeps it; `coc_input --event ConfirmPressed` then uses it. How a flow aims an area technique without the stick | `u-review` |
 | `coc_session_probe` | Play Mode: what the game session holds: quests and steps, set flags, everything unlocked, play time, the last save or load. `coc_session_new`, `coc_session_save --slot`, `coc_session_load --slot`, `coc_session_autosave` and `coc_session_list` act on it (saves and loads finish in the background; probe again) | `u-review` |
 | `coc_theme_report` | Any visual work. Resolves `ThemeConfig` tokens, fonts and timings to concrete values so you can see what the theme actually says | `u-ui/design-ref.md` |
 | `coc_shader_users` | Before changing any shader or shader include. `--shader "Chains/UI/Brush Stroke"` (or a `.shader` / `.hlsl` path) lists its materials, the scenes, prefabs and assets using them, and code naming it; for an include, every shader including it | `u-review` |

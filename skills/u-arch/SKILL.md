@@ -255,6 +255,24 @@ in this codebase's form, is in [refactoring-ref.md](refactoring-ref.md). Watch f
 Exempt by design: strategies reading their context, config SOs and event structs as data,
 thin facades and adapters, a local exhaustive switch over a closed category.
 
+### Duplication
+
+- **Look before writing a helper**: the shared library first (`u-extensions`), then the project's
+  shared assemblies and test support. A copy of a loop, lookup, fake or test kit is the sign to fold it.
+- **Fold to the narrowest home that every user can reach**: a generic piece (no game words in it) to
+  the shared library; a game-wide one to the project's shared assembly; one feature's to its folder.
+  Test fakes and kits go in a test-support assembly every test assembly references, never copied.
+- **Same shape, different meaning, stays apart.** Two lookups that look alike but differ in what they
+  answer (every match against the first, a living-only filter, a different exception) are not
+  duplicates; folding them changes behaviour.
+- **One owner for shared wording and formatting**: words on screen, a tool's error answers, the
+  rounding of reported numbers.
+- **Moving a member to a base class**: once the base implements an interface, a derived class's
+  same-named public method no longer implements it (C# maps the interface to the base). Make the
+  base member `virtual` and the derived one `override`, and pin it with a test through the interface.
+- **A fold changes no behaviour.** Check every key, default, null check and order against the
+  original, and say in the commit when a fold also fixes something.
+
 ## When to Refactor
 
 - **Before a feature**, when the code's shape makes the feature awkward; **on a bug**, when the bug
