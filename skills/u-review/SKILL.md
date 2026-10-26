@@ -105,6 +105,8 @@ Which reviewer owns each section is in [reviewers.md](reviewers.md).
 - [ ] No lazy class or middle man that only forwards (strategies, adapters, facades exempt)
 - [ ] Every pattern answers a problem present today; none has one implementation and no second in sight
 - [ ] Duplication: a second copy is a note, a third is a finding (structure only; values always)
+- [ ] Nothing re-implements a piece the project already has (its reuse index or shared library, e.g. a
+      project skill listing them): a copy of an existing shared piece is a finding at the first copy
 
 ### Refactor vs feature
 - [ ] A commit called a refactor changes no behaviour, and ships no feature or balance change

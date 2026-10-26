@@ -19,6 +19,22 @@ A refactor changes structure, never behaviour: no feature and no balance change 
 5. **Diff the after snapshot** against the before one; it must be identical (or differ exactly as intended).
 6. **Delete the old shape** in its own commit once nothing reads it.
 
+### Refactoring by script
+
+Folding many sites at once is done by script, and scripts fail in quiet ways. Before writing any file:
+
+- **Count the sites and assert the count.** A rewrite that matches a different number of sites than you
+  found by hand is wrong; stop and look.
+- **Match call sites, not declarations.** A rename regex that also hits a method's own declaration, or a
+  same-named member elsewhere, changes code it was never meant to touch.
+- **Never re-sort usings or reformat by script**; add a using in its sorted place and leave the rest.
+- **Edit blocks with a brace-balanced scan**, never a regex that can swallow a closing brace or an argument.
+- **After the rewrite**: compile, read the diff of every touched file, run every suite that covers them.
+- **Stage what changed, all of it**: list the working tree after staging; an asset edited in the Editor
+  alongside the code is the easy one to leave behind.
+- **One reviewer per fold**, reading every changed line against the original, catches what the compiler
+  and tests do not (unreachable overrides, a dropped default, a changed order).
+
 A test that had to change in a refactor means either the behaviour changed (then it was not a refactor) or
 the test was coupled to internals (move it to public behaviour). Say which.
 
