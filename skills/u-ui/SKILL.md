@@ -185,10 +185,10 @@ is a prefab too, pool templates included, bound to an element ViewModel at rent 
 animate frequently should live on their own sub-Canvas (batching). The user tunes sizes, positions
 and values in the Inspector without code, so:
 
-- **Never rebuild UI from a script.** Builders that recreate hierarchies wipe hand tuning; they are
-  archived (`Design/revamp/builders/archive/`). A large mechanical change may be scripted, but only by
-  loading the prefab (`PrefabUtility.LoadPrefabContents`), changing just what the edit is about, and
-  saving it (`SaveAsPrefabAsset`). See `Design/revamp/builders/README.md`.
+- **Never rebuild UI from a script.** Builders that recreate hierarchies wipe hand tuning (Chains of Contract
+  deleted its old ones). A large mechanical change may be scripted, but only by loading the prefab
+  (`PrefabUtility.LoadPrefabContents`), changing just what the edit is about, and saving it
+  (`SaveAsPrefabAsset`). The project's own steps: `Design/hud/hud-guide.md`.
 - **Never construct UI at runtime.** `UIWidgetPool` instantiating an authored template is the only
   runtime `Instantiate`.
 - **One owner per value.** If code must set a rect or size (animation, state), read the rest value

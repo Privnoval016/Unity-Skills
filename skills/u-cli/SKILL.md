@@ -148,6 +148,20 @@ Discover with `unity command --tag coc --format json`. Never assume this table i
 | `coc_build_savecheck` | Edit Mode: builds the save check's development macOS build (`--il2cpp true` as the game ships); `.claude/scripts/buildcheck.sh` builds and runs it. Slow: minutes, and the Editor is held while it builds | `u-review` |
 | `coc_theme_report` | Any visual work. Resolves `ThemeConfig` tokens, fonts and timings to concrete values so you can see what the theme actually says | `u-ui/design-ref.md` |
 | `coc_shader_users` | Before changing any shader or shader include. `--shader "Chains/UI/Brush Stroke"` (or a `.shader` / `.hlsl` path) lists its materials, the scenes, prefabs and assets using them, and code naming it; for an include, every shader including it | `u-review` |
+| `coc_gauge_set` | Play Mode, in a fight: sets one fighter's gauge to a share of its maximum, to look at a HUD state (a ready Ultimate, low Health, Shatter) without playing up to it | `u-ui/design-ref.md` |
+| `coc_technique_player` | Edit Mode: enters Play Mode on the Technique Player with its cursor on `--technique` (every technique, Ultimate and Joint Attack on one picker). Drops unsaved scene changes, no dialog | `u-review` |
+| `coc_technique_pick` | Play Mode, the technique list open: moves its cursor to `--name`, so `ConfirmPressed` chooses it | `u-review` |
+| `coc_sequence_build` | Edit Mode: lays every Sequence Plan matching `--filter` out again as its sequence, each blow on its clip's measured hit (a plan marked Tailored By Hand is left alone) | `u-review` |
+| `coc_sequence_hits` | Edit Mode: where each plan's hits land against the contacts measured in its clips; OFF lines land off contact, PROBLEM could not be measured | `u-review` |
+| `coc_sequence_probe` | Play Mode: whether a sequence is playing, its time and length, its stage marks, where the caster and first target are, the time scale | `u-review` |
+| `coc_sequence_render` / `coc_sequence_sheet` | Edit Mode: a sequence's own camera rendered at chosen times (`Temp/shots/<name>_<time>.png`), or at even moments tiled into one sheet | `u-ui/design-ref.md` |
+| `coc_sequence_frames` | Edit Mode: checks each beat's target is inside the live shot at that moment, at each of `--distances`; lists the beats that are not | `u-review` |
+| `coc_clip_import` / `coc_clip_catalog` | Edit Mode: brings in the clips a character's clip plan lists; renders a pack folder's clips on a character into contact strips and a manifest | `u-anim` |
+| `coc_liveaction_build` | Edit Mode: builds each character's Live Action (attacks, combo tree, reactions, wiring, hit and combo events from the measured motion) from their Live Action plan | `u-anim` |
+| `coc_attack_frames` / `coc_hitbox_report` | Edit Mode: renders an attack's clips at its hit events; samples an attack's hitboxes and reports each window against the swing's fastest point | `u-anim` |
+| `coc_attack_test` / `coc_attack_result` | Play Mode: stands a target before a character, presses an attack (or plays `--sequence`) and records every hit; the result reads what landed and how each hit felt, frame by frame | `u-review` |
+| `coc_perf_start` / `coc_perf_mark` / `coc_perf_result` | Play Mode: records every frame's length, allocation and engine markers; marks what was just done; reads the median, percentiles and worst frames. Through `perfrun.sh` / `perfhold.sh`, never an eval | `u-review` |
+| `coc_perf_stalls` | Play Mode: names the managed methods behind a macOS `sample` capture's compiler stalls (`Temp/stalls.txt`) | `u-review` |
 
 **Run the cheap ones before the expensive ones.** `coc_missing_refs` and `coc_asset_audit` answer
 "is this a bug?" without entering Play Mode, and that is the first question in `design-ref.md`'s

@@ -10,12 +10,9 @@ of Contract that is `Design/STYLE.md` (colour, type, motion, signatures, asset r
 
 ## Read this first: check for a bug before you critique taste
 
-`Design/combat/battle-system.md` §11 says visual polish was "intentionally left simple/functional… real design
-work for a later pass," and §17 opens with Phase 7 having "shipped functionally correct but visually
-under-baked." The UI is not a failure to correct. It is a deferral.
-
-More useful: when that visual feedback was investigated, it "surfaced two real bugs plus one
-architectural mistake rather than pure style opinions."
+In Chains of Contract, the first combat HUD shipped functional and plain on purpose, with the design deferred (its
+history: `Design/archive/combat/battle-system-history.md`). When feedback on it was investigated, it "surfaced two
+real bugs plus one architectural mistake rather than pure style opinions."
 
 - "Only one meter is visible" — rows only updated on `GaugeUpdatedEvent`, so a resource that started
   full and had not changed yet rendered at whatever `fillAmount` the prefab was authored with.
