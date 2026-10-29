@@ -157,6 +157,7 @@ Discover with `unity command --tag coc --format json`. Never assume this table i
 | `coc_sequence_probe` | Play Mode: whether a sequence is playing, its time and length, its stage marks, where the caster and first target are, the time scale | `u-review` |
 | `coc_sequence_render` / `coc_sequence_sheet` | Edit Mode: a sequence's own camera rendered at chosen times (`Temp/shots/<name>_<time>.png`), or at even moments tiled into one sheet | `u-ui/design-ref.md` |
 | `coc_sequence_frames` | Edit Mode: at each of `--distances`, checks each beat's target is inside the live shot and no body in a shot is cut off at the frame's edge (each beat, each shot's start, middle and end); lists each miss once with its distances | `u-review` |
+| `coc_sequence_pops` | Edit Mode: plays each sequence offscreen on its stand-ins and lists each pop, a frame where a body's pose jumps far more than the frames either side (`--least`, `--over`) | `u-review` |
 | `coc_clip_import` / `coc_clip_catalog` | Edit Mode: brings in the clips a character's clip plan lists; renders a pack folder's clips on a character into contact strips and a manifest | `u-anim` |
 | `coc_liveaction_build` | Edit Mode: builds each character's Live Action (attacks, combo tree, reactions, wiring, hit and combo events from the measured motion) from their Live Action plan | `u-anim` |
 | `coc_attack_frames` / `coc_hitbox_report` | Edit Mode: renders an attack's clips at its hit events; samples an attack's hitboxes and reports each window against the swing's fastest point | `u-anim` |
