@@ -153,7 +153,7 @@ Discover with `unity command --tag coc --format json`. Never assume this table i
 | `coc_technique_pick` | Play Mode, the technique list open: moves its cursor to `--name`, so `ConfirmPressed` chooses it | `u-review` |
 | `coc_sequence_build` | Edit Mode: lays every Sequence Plan matching `--filter` out again as its sequence, each blow on its clip's measured hit (a plan marked Tailored By Hand is left alone) | `u-review` |
 | `coc_outcome_record` | Edit Mode: records what every action does (its outcome fields and its sequence's landing order) as the baseline `TechniqueOutcomeTests` holds them to; run only when an outcome is meant to change | `u-review` |
-| `coc_sequence_hits` | Edit Mode: where each plan's hits land against the contacts measured in its clips; OFF lines land off contact, PROBLEM could not be measured | `u-review` |
+| `coc_sequence_hits` | Edit Mode: each plan's hits against their contacts: a cut's as its built sequence plays (the blade followed against the target), anything else's as measured in the clip; OFF, SHORT (a swing that never touches) and PROBLEM lines, with counts | `u-review` |
 | `coc_sequence_probe` | Play Mode: whether a sequence is playing, its time and length, its stage marks, where the caster and first target are, the time scale | `u-review` |
 | `coc_sequence_render` / `coc_sequence_sheet` | Edit Mode: a sequence's own camera rendered at chosen times (`Temp/shots/<name>_<time>.png`), or at even moments tiled into one sheet | `u-ui/design-ref.md` |
 | `coc_sequence_frames` | Edit Mode: at each of `--distances`, checks each beat's target is inside the live shot and no body in a shot is cut off at the frame's edge (each beat, each shot's start, middle and end); lists each miss once with its distances | `u-review` |
