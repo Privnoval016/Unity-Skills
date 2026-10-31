@@ -1,7 +1,8 @@
 ---
 description: >
   Planning assistant for Unity features. Explores codebase, asks thorough granular questions,
-  writes an implementation plan. Invoke before any non-trivial implementation.
+  writes an implementation plan, and runs a design review of the plan before it is shown. Invoke before
+  any non-trivial implementation.
 when_to_use: >
   "plan", "design", "implement", "add feature", "how should I implement", "think through",
   any request involving writing new systems or significant code changes.
@@ -141,6 +142,12 @@ instead of freezing at whatever shipped first.
 
 Save the plan to `.claude/plans/<kebab-case-feature-name>.md`.
 
+### The Design Review section is mandatory
+
+Every plan ends with a `## Design Review` section, written in Step 4: who reviewed it, each finding kept
+and what changed in the plan because of it, each finding dropped and why, and the questions it raised
+for the user.
+
 ### Refactor plans
 
 A refactor plan is a different kind of plan: it changes structure and no behaviour. Refactor does not
@@ -155,10 +162,32 @@ mean rewrite. Follow `../u-arch/refactoring-ref.md` ("How a refactor is done") a
 
 ---
 
-## Step 4: ExitPlanMode
+## Step 4: Design Review
 
-After writing the plan file, call `ExitPlanMode` to present it to the user for approval before any
-implementation begins.
+A flaw found in the plan costs a paragraph; the same flaw found in code review costs the code. So every
+plan is reviewed for design before it is shown, in addition to (never instead of) the code review that
+ends the feature (`../u-review`).
+
+1. **Reviewers run in parallel**, read-only, on a cheaper model (sonnet), each with the plan's path, its
+   brief from [reviewers.md](reviewers.md), and the docs and decisions the plan rests on. Four for a plan
+   of several phases, as the code review uses; for a plan of a step or two, run the four passes yourself.
+   Where the project limits agents at once, follow its rule.
+2. **Lead consolidates.** Merge duplicates, drop findings that contradict a documented decision, and
+   **verify every remaining finding** against the code or doc it cites. A plausible guess is not a
+   finding.
+3. **Fix the plan.** Change the steps, files, tests or verification each kept finding calls for. A
+   finding that needs a decision the docs don't hold becomes a question for the user, never a choice
+   made in the plan.
+4. **Record it** in the plan's `## Design Review` section, then present.
+
+For a large plan, review it again after big changes; a re-review only reads what changed.
+
+---
+
+## Step 5: ExitPlanMode
+
+After the design review, call `ExitPlanMode` to present the plan to the user for approval before any
+implementation begins, with the review's open questions asked alongside it.
 
 ---
 

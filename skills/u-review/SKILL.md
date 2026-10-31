@@ -15,6 +15,10 @@ allowed-tools: Read Bash Agent
 If the branch has no diff (work on `main`), the scope is the uncommitted and staged changes, or the
 files the request names.
 
+This is the review of the **code**. The plan it was built from had its own design review before any
+code was written (`../u-plan`, Step 4); the code review still runs in full, and also checks the code
+kept to the reviewed plan (a departure is a finding unless the plan was changed on purpose).
+
 ## How the review runs
 
 One lead (you) and four reviewers, each with one viewpoint. Four is enough to cover the ground without
