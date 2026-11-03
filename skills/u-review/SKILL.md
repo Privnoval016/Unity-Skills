@@ -23,7 +23,7 @@ kept to the reviewed plan (a departure is a finding unless the plan was changed 
 
 One lead (you) and four reviewers, each with one viewpoint. Four is enough to cover the ground without
 reviewers repeating each other; do not add more for a small change, and for a change of a file or two
-run the passes yourself. Every code change gets one or the other: there is no change too small to review.
+run the passes yourself.
 
 1. **Lead prepares.** List the scope, run the non-C# checks below, and run the tests the change
    touches. Read `../u-arch/extensions-ref.md` and `../u-arch/refactoring-ref.md`.
