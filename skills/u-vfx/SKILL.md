@@ -28,7 +28,7 @@ and what already plays cues. Check the project's hard rules on art sources befor
 |---|---|
 | `VfxEffect` (abstract SO) | One effect: `Lifetime`, `Prewarm`, `CreateInstance(parent)` → `IVfxInstance` |
 | `IVfxInstance` | One pooled instance: `Play(context)`, `Stop(immediately)`, `IsShowing`, `SetStrength`, `SetColour`, `Release` |
-| `VfxCue` (enum) | The moments code can name |
+| `VfxCue` (enum) | The cues code can name (a project may also key a set's rows on named moment assets, for moments a sequence or a character adds without a code change) |
 | `VfxSet` (SO) | An owner's rows of cue → effect, with an optional tint |
 | `VfxParameter` (SO), `VfxValue`, `VfxOverride` | A nameable thing to change, a number / colour / curve / gradient for it, and the pair. Effects list the parameters they answer and what each drives; unanswered ones are ignored |
 | `VfxVariant` (SO) | Another effect with parameters changed and its own lifetime; never a copy of the prefab or graph |
@@ -60,7 +60,7 @@ _flight.Stop();
    disable). Never play a 0-lifetime effect and drop the handle.
 5. **Lifetimes run on game time.** Hitstop and slow motion must hold an effect with its blow. An effect
    that must keep moving through a freeze is the rare exception and says so on the asset.
-6. **A new moment is a new enum value at the end** of `VfxCue` (never reorder: assets store the
+6. **A new cue is a new enum value at the end** of `VfxCue` (never reorder: assets store the
    number), plus a row in the README's table of what plays it.
 7. **A new kind of effect is a subclass**, with a private nested `IVfxInstance`. If it needs a package,
    it lives in the VFX assembly so nothing else references that package.
