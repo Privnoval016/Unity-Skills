@@ -168,10 +168,11 @@ A flaw found in the plan costs a paragraph; the same flaw found in code review c
 plan is reviewed for design before it is shown, in addition to (never instead of) the code review that
 ends the feature (`../u-review`).
 
-1. **Reviewers run in parallel**, read-only, on a cheaper model (sonnet), each with the plan's path, its
-   brief from [reviewers.md](reviewers.md), and the docs and decisions the plan rests on. Four for a plan
-   of several phases, as the code review uses; for a plan of a step or two, run the four passes yourself.
-   Where the project limits agents at once, follow its rule.
+1. **Two reviewers run in parallel**, read-only, on a cheaper model (sonnet), each with the plan's path,
+   two of the four briefs from [reviewers.md](reviewers.md) (one takes design fit with data and authoring,
+   the other behaviour with tests and verification), and the docs and decisions the plan rests on. Two,
+   not the code review's four: the plan is short and the code review still runs in full. For a plan of a
+   step or two, run the four passes yourself.
 2. **Lead consolidates.** Merge duplicates, drop findings that contradict a documented decision, and
    **verify every remaining finding** against the code or doc it cites. A plausible guess is not a
    finding.

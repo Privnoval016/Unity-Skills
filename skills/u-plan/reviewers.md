@@ -1,7 +1,8 @@
 # Plan reviewers
 
-The design review of a written plan, before any code. Four briefs, one per viewpoint. Each reviewer is
-read-only, reads the whole plan and the code and docs it names (in full, not skimmed), and reports
+The design review of a written plan, before any code. Four briefs, one per viewpoint, held by two
+reviewers: one takes Design fit with Data and authoring, the other Behaviour with Tests and verification.
+Each reviewer is read-only, reads the whole plan and the code and docs it names (in full, not skimmed), and reports
 plan section · rule or decision · what is wrong · failure scenario · concrete fix. A finding must name
 the file, doc section or decision it rests on; "might be a problem" is not a finding. Findings outside
 its viewpoint are passed along in one line, not worked up. The lead merges, verifies and ranks.
