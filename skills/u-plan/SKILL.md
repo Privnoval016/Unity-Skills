@@ -113,6 +113,12 @@ After the user has answered all questions, write a concrete implementation plan:
 ## Architecture Notes
 <Key decisions and why — reference answers from the Q&A>
 
+## Who pays
+<Every field, flag, reference, list, interface member or branch the plan adds to a SHARED type (a component, config,
+asset type or interface used by more than one thing): its users, and how many need it. If not all do, say where it
+lives instead (the data that needs it, an opt-in component, a narrow capability interface). "None added" is a valid
+answer; leaving the section out is not.>
+
 ## Performance Checklist
 - [ ] ZLinq used instead of System.Linq where applicable
 - [ ] No Find/GetComponent in hot paths
@@ -122,6 +128,12 @@ After the user has answered all questions, write a concrete implementation plan:
 <One runnable command per implementation step. See u-cli/recipes-ref.md.>
 - Step N: `unity command ...` / `unity test --filter ...` — expected result
 ```
+
+### The Who pays section is mandatory
+
+A special case added to a shared type makes every user carry it (a field only three sequences use, on every sequence
+director). Counting the users before writing the plan is cheaper than the refactor after; plan reviewers check this
+section first.
 
 ### The Verification section is mandatory
 

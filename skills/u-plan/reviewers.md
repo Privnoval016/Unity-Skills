@@ -23,6 +23,11 @@ does any dependency point the wrong way? Ask of each new type: would the next ch
 resource or kind of action need an edit here? Flag a pattern that answers no present problem as firmly as
 a missing one, a concept named after one character, and a folder plan that will need a later move.
 
+Start with the plan's Who pays section. For each member it adds to a shared type, count that type's users in
+the assets and callers, and how many need the member. Report any member not every user needs, and name where
+it should live instead: the data that needs it, an opt-in component, or a narrow capability. Also report any
+such member the section leaves out, and a section that is missing.
+
 ## Behaviour
 
 List every rule the design decided for this work (quote the doc or ruling) and find the plan step that

@@ -96,6 +96,9 @@ Which reviewer owns each section is in [reviewers.md](reviewers.md).
 - [ ] No type checks (`is`, `as`, type switches) in game logic; optional capabilities via `Capability<T>()`
 - [ ] `[CreateAssetMenu]` present on all concrete Config / Factory / Data Provider SOs
 - [ ] `[SerializeReference]` used for polymorphic SO fields where appropriate
+- [ ] Who pays: every field, flag, reference or branch added to a shared type is needed by all its users (count them in
+      assets and callers); a special case lives on the data that needs it or an opt-in component/capability
+- [ ] Tooltips and comments describe the code for its reader; no decision citations, dates or names (those live in docs)
 
 ### Smells and patterns (`u-arch` Code Smells, `refactoring-ref.md`, `patterns-ref.md`)
 - [ ] No long method that wants a comment per block; no more than 3 parameters without a parameter object
