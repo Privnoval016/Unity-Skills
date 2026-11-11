@@ -43,7 +43,6 @@ capability interface exposing a direct one-shot play call:
 public interface ICombatAnimationDriver
 {
     AnimancerLayer BaseLayer { get; }
-    AnimancerLayer UpperBodyLayer { get; }
     AnimancerState PlaySource(IAnimationSource source, AnimancerLayer layer, float fadeDuration, FadeMode mode = default);
     void SetRootMotionEnabled(bool enabled);
     // + AnimationEvent-relayed events (hitbox windows, cancel windows, phase-end) — see combat docs
@@ -148,9 +147,10 @@ than embedding that logic inline in the selector or the driver.
 
 ## Layers
 
-`AnimancerLayer` via `AnimancerComponent.Layers[index]` — locomotion plays on the base layer; combat
-exposes a mask-overlay layer (`UpperBodyLayer`) for actions that should play over continued locomotion
-(a quick attack that doesn't root the character in place), chosen per-attack via a `LayerMode` enum.
+`AnimancerLayer` via `AnimancerComponent.Layers[index]` — locomotion plays on the base layer, and a combat
+phase plays on that same layer with the driver's locomotion selection suspended. Add an upper-body mask
+layer only when an action must play over continued locomotion, as an opt-in the attack names; a layer no
+action plays on is not exposed.
 
 ## Root Motion
 
