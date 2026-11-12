@@ -82,6 +82,19 @@ Every change is undone when the pooled instance is next played, so an instance k
 it applies (see `ParticleAuthored`). A new thing to drive on a particle system is one `ParticleField`
 value with its capture, restore and apply; on a graph it is an exposed property and a binding row.
 
+**A shader property per play** (a shape, a rim, an edge colour) goes through a `MaterialPropertyBlock`, never a
+material copied per play or per character (a copy is a new batch and a new first-use compile):
+- one block per renderer, reused; read, change, write back, so two bindings on one renderer keep each other;
+- capture lazily on the first write: keep the renderer's own block (a `ParticleSystemRenderer` has a non-empty one
+  of Unity's from the start, so never test "has a block" to mean "was touched") and put exactly that back;
+- `renderer.SetPropertyBlock(block)` reaches every material the renderer draws, a particle trail's included (checked:
+  `SetPropertyBlock(block, 1)` reaches only the trail), so list and validate properties from both shaders;
+- store the property as a name picked from a dropdown read from those shaders, with a check that lists any name no
+  shader it reaches has, and cache its id.
+
+**Layers.** Tag each particle system in a prefab with the layer it belongs to (an asset, not a string or an enum),
+and let a binding name a layer: then a variant can colour one layer (a character's motif) and leave the rest.
+
 ## Building a VFX Graph effect
 
 The graph kind drives any graph through fixed names, so a graph needs no script of its own.
