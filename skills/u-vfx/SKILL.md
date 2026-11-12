@@ -149,6 +149,9 @@ Both are played the same way, so the choice is per effect and can change later.
 - `Max Particles` set to what the effect needs, for the same reason as a graph's capacity.
 - `Culling Mode` Always Simulate only for effects whose timing matters off screen; otherwise Automatic.
 - Colour is taken through the main module's start colour only when the asset says the effect takes one.
+- A trail's **Lifetime** is a share of its particle's lifetime, never seconds. A held effect's head (one particle that
+  lives as long as the effect is held) needs a tiny share for a short wake, and must end when the effect stops: a
+  stopped system only stops emitting, so a long-lived head keeps showing, and holds its pooled instance, until it dies.
 
 ## In a Timeline
 
