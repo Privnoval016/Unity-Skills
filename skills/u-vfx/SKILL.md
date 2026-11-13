@@ -28,11 +28,12 @@ and what already plays cues. Check the project's hard rules on art sources befor
 |---|---|
 | `VfxEffect` (abstract SO) | One effect: `Lifetime`, `Prewarm`, `CreateInstance(parent)` → `IVfxInstance` |
 | `IVfxInstance` | One pooled instance: `Play(context)`, `Stop(immediately)`, `IsShowing`, `SetStrength`, `SetColour`, `Release` |
+| `ITickingVfxInstance` (optional) | An instance with work every frame it plays or fades (a ribbon sampling a blade): the service calls `Tick(now)` on game time after moving it with what it follows. Asked for through one `Capability<T>()` lookup |
 | `VfxCue` (enum) | The cues code can name (a project may also key a set's rows on named moment assets, for moments a sequence or a character adds without a code change) |
 | `VfxSet` (SO) | An owner's rows of cue → effect, with an optional tint |
 | `VfxParameter` (SO), `VfxValue`, `VfxOverride` | A nameable thing to change, a number / colour / curve / gradient for it, and the pair. Effects list the parameters they answer and what each drives; unanswered ones are ignored |
 | `VfxVariant` (SO) | Another effect with parameters changed and its own lifetime; never a copy of the prefab or graph |
-| `VfxContext` (struct) | Position, rotation, strength 0–1, scale, colour, follow target. Build with `VfxContext.At(...)` or `VfxContext.On(...)` |
+| `VfxContext` (struct) | Position, rotation, strength 0–1, scale, colour, follow target, a second point to stretch to (`SpanTo`). Build with `VfxContext.At(...)` or `VfxContext.On(...)` |
 | `IVfxService` | `Play(effect, context)`, `Play(set, cue, context)`, `Prewarm(set)`; returns a `VfxHandle` |
 | `VfxHandle` (struct) | `Stop`, `MoveTo`, `Follow`, `SetStrength`, `SetColour`, `IsPlaying`. A default or stale handle is safe |
 
