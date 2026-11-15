@@ -43,3 +43,8 @@ if it regressed, or report that none would. Look for vacuous asserts, tests that
 test's leftovers (stat bases, registries, statics), missing restores, ScriptableObjects never
 destroyed, tests asserting a design that no longer exists, and missing edge, boundary and regression
 cases. Propose each missing test as a name plus what it asserts.
+
+Flag any test that pins a value a designer can tune in the Inspector (a power, a duration, a cost, a
+stat, a position, a size, a colour on a shipped asset or prefab): ask "would a hand tweak fail this?".
+Such a test reads the value from the asset and checks the rule that ties it to the outcome, or tests
+the mechanic on its own made data; a shipped asset is checked only for its wiring.
