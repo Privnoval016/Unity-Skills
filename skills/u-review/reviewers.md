@@ -47,4 +47,6 @@ cases. Propose each missing test as a name plus what it asserts.
 Flag any test that pins a value a designer can tune in the Inspector (a power, a duration, a cost, a
 stat, a position, a size, a colour on a shipped asset or prefab): ask "would a hand tweak fail this?".
 Such a test reads the value from the asset and checks the rule that ties it to the outcome, or tests
-the mechanic on its own made data; a shipped asset is checked only for its wiring.
+the mechanic on its own made data; a shipped asset is checked only for its wiring. Judge against the u-test skill (its
+six patterns, honest reads, the break and tweak proofs); a test that writes a real project file or leaves global
+state behind is a finding.
