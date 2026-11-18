@@ -65,6 +65,10 @@ A read value can hide a bug. These keep a read-and-relate test able to fail:
 - An assert inside a callback proves nothing if the callback never runs: count the calls and assert the count.
 - A loop over found things asserts it found some, against an independent count, or the loop can be empty.
 - A test of "it fails cleanly" asserts the failure's message, not only that something threw.
+- NUnit compares a `Transform` as the collection of its children (it is `IEnumerable`), so `Does.Contain`,
+  `Is.EquivalentTo` and `Is.EqualTo` on Transforms, or on lists of them, pass for any two with alike children: compare
+  names, instance ids, or `ReferenceEquals` instead. A break proof is what shows it: the assert passes with the code
+  removed.
 
 ## Render tests
 
