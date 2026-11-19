@@ -122,8 +122,9 @@ covers, would this fail?" The answers must be no and yes.
 - **The break proof**: `.claude/scripts/breakproof.py <proofs.py>` (a list of file, text to break, its replacement,
   the suite, the test expected to fail); targeted as above (Pranav, 2026-11-19: about one proof in eight found a hollow
   test, every one of the shapes listed); run in the background, taking the to-do's Downtime queue meanwhile. A proof
-  edits code in place while it runs, so never let a reviewer or audit read the files then: it reports the proof's
-  deliberate break as a bug.
+  edits code in place while it runs, so a reviewer or audit reads the **staged** copies (`git diff --cached`,
+  `git show :<path>`), which a proof never touches: the two run side by side, and the reviewer never reports a proof's
+  deliberate break as a bug. Stage the change before asking for the review.
 - **The tweak proof**: `TWEAKS="tweaktunables.cs tweaklayout.cs" .claude/scripts/tweakproof.sh "<Assembly> assembly"`
   (`KEEP=<folder>` keeps each run's results). It restores only the assets it tweaked.
 - **Save fixtures**: the recording holds what tuned content can't move; party, quests and bonds are relations to the
