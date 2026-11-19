@@ -91,6 +91,17 @@ find a row fails naming the asset and the row kind.
 
 - **The break proof**: break the code the test covers (ignore an input, drop a line, off-by-one a clamp), run, see it
   fail, undo. A test that passes a break is vacuous: fix it before trusting it.
+- **Which tests get one** (targeted, not every test): a proof costs a compile and a run, and the hollow tests it finds
+  share a few shapes, so prove those shapes and skip the rest:
+  - a test whose expected value is worked out through the code under test or code it shares (a reference rendered
+    or computed by the same path, a "nothing changed" against a baseline made the same way);
+  - a test that can't tell its inputs apart (two flags set together, symmetric values, one case standing for many);
+  - comparisons of renders, frames or pixels, and checks of source text;
+  - anything read indirectly: globals, events, callbacks, reflection, a pooled or reused object's state;
+  - one proof per new test file or suite, so its wiring (the fixture, the filter) is shown to run.
+
+  Skip a direct assert on a value the test sets itself and reads straight back. When a proof misses, fix the test and
+  look for its siblings of the same shape.
 - **The tweak proof**: change the tuned values it reads, up and down and to the edges, run, see it pass, restore. A
   test that fails a tweak pins a tunable. Check the tweak really applied (count what changed) and that nothing it
   touched in memory survives the restore.
@@ -108,6 +119,9 @@ covers, would this fail?" The answers must be no and yes.
 - **Running**: `.claude/scripts/utest.sh <name> [assembly]`. A filter is a name, never a pattern
   (`utest.sh Game.Party.Tests assembly` for one assembly). Run the assemblies a change touches; CI runs every test on
   every commit (`.claude/scripts/ci/ci-status.sh -v`).
+- **The break proof**: `.claude/scripts/breakproof.py <proofs.py>` (a list of file, text to break, its replacement,
+  the suite, the test expected to fail); targeted as above (Pranav, 2026-11-19: about one proof in eight found a hollow
+  test, every one of the shapes listed); run in the background, taking the to-do's Downtime queue meanwhile.
 - **The tweak proof**: `TWEAKS="tweaktunables.cs tweaklayout.cs" .claude/scripts/tweakproof.sh "<Assembly> assembly"`
   (`KEEP=<folder>` keeps each run's results). It restores only the assets it tweaked.
 - **Save fixtures**: the recording holds what tuned content can't move; party, quests and bonds are relations to the
