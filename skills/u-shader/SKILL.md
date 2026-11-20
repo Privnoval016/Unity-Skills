@@ -98,7 +98,9 @@ rules, and each fix that taught something adds its rule here, never one case's d
 
 - **Measure before and after**, a state held (a median per stretch) for steady cost and a run of first uses for
   spikes, at the play size **and** at the largest resolution shipped (per-pixel cost scales with it). Here:
-  `perfhold.sh` (its `fields` mode for ground marks), `perfrun.sh`, `firstfight.sh` for a build's first fight.
+  `perfhold.sh` (its `fields` mode for ground marks), `perfrun.sh`, `firstfight.sh` for a build's first fight,
+  `fieldscost.sh` for the fields' GPU time in a build (two builds to compare a change).
+- **A frame capped by vsync or a frame-rate limit hides GPU cost:** every stretch reads the cap. Read the GPU's own time.
 - **GPU time can't be read in the Editor.** Unity's frame timing there reports a GPU time for only a few frames in a
   hundred, and its frame includes the Editor's own windows (twice the whole frame's length): Editor frame times show a
   steady cost only when it is large against their own swing (several ms at 4K). To prove a sub-millisecond GPU saving,
@@ -127,5 +129,8 @@ rules, and each fix that taught something adds its rule here, never one case's d
     edge and deep in the fill where the edge's noise changes nothing: early-outs by the shape's own reach. The glyph
     on top computed its noise. Count reads per pixel, not only computed calls; and search a shader for the exact helper
     name before judging it (a search for `Fbm3` also matches `InkBakedFbm3`).
+  - Measured in a build (2026-11-20, `fieldscost.sh`, 3456 x 2168): three fields cost about 0.3 ms of GPU, eight about
+    15 ms: cost isn't linear in count when fields can lie near the camera and cover the screen. The early-outs and the
+    baked noise made no measurable difference there: measure what dominates before cutting.
   - The field views' pool asset held 4 against a decided 8 (the asset was saved before the code's default changed):
     a decided number lives in the asset and a test holds it.
