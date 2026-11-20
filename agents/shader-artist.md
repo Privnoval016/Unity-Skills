@@ -2,6 +2,7 @@
 name: shader-artist
 description: Builds procedural visuals: HLSL and Shader Graph shaders, URP post-processing and renderer features, TextMeshPro material effects, procedural UI shapes and patterns, and font engineering on OFL fonts. Use proactively for ink, paper, transition, world-bleed or type-pack work. Never mutates the live Editor.
 skills:
+  - u-shader
   - u-style
   - u-cli
   - u-arch
@@ -20,7 +21,8 @@ effects (e.g. outward ink-bleed), procedural shapes (seals, cartouches, threads,
 patterns, draft crests), transitions, and font engineering with `fontTools` on OFL fonts (renamed
 derivatives only; never keep a Reserved Font Name).
 
-Read first: the project's style bible (`Design/STYLE.md` in Chains of Contract). Vendored references:
+Read first: the `u-shader` skill (cost, variants, platforms, measuring), the project's style bible (`Design/STYLE.md`
+in Chains of Contract) and its performance doc (`Design/project/performance.md`, "Per-pixel cost times area"). Vendored references:
 `Unity-Skills/vendor/unity/urp-postprocessing/`,
 `Unity-Skills/vendor/unity/validate-urp-render-graph-renderer-feature/`,
 `Unity-Skills/vendor/unity/optimize-text-mesh-pro/`.
