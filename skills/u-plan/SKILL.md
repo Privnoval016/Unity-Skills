@@ -109,6 +109,9 @@ After the user has answered all questions, write a concrete implementation plan:
 ## Implementation Steps
 1. <First thing to do — specific>
 2. …
+<Mark each part that is a defined task (written input, files or a report out, a checkable done-when: tests for a
+finished design, a helper to a spec, a doc sweep) as one a small agent can take beside the main work; it keeps the
+main context clean and runs in parallel. Editor work and open judgements stay with the main session.>
 
 ## Architecture Notes
 <Key decisions and why — reference answers from the Q&A>
