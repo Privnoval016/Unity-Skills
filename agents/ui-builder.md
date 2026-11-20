@@ -10,6 +10,7 @@ skills:
 disallowedTools: Agent
 memory: project
 color: purple
+model: sonnet
 ---
 
 You implement game UI. You do not decide what it should look like: that is already decided.

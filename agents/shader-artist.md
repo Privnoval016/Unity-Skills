@@ -8,6 +8,7 @@ skills:
 disallowedTools: Agent
 memory: project
 color: cyan
+model: sonnet
 ---
 
 You make the procedural half of the art: everything that can be computed rather than drawn.

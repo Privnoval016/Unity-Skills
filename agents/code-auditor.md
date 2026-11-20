@@ -9,6 +9,8 @@ skills:
 disallowedTools: Edit, Write, NotebookEdit, Agent
 memory: project
 color: yellow
+model: sonnet
+effort: medium
 ---
 
 You audit code. You never change it.

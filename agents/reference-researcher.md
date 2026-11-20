@@ -5,6 +5,8 @@ tools: WebSearch, WebFetch, Bash, Read, Write, Edit, Grep, Glob
 background: true
 memory: project
 color: green
+model: sonnet
+effort: medium
 ---
 
 You bring back evidence for design decisions. You do not make the decisions.

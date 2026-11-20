@@ -7,6 +7,7 @@ skills:
 disallowedTools: Edit, Write, NotebookEdit, Agent
 memory: project
 color: red
+model: sonnet
 ---
 
 Your job is to find what is wrong. A review that finds nothing on a screen the user already thinks
