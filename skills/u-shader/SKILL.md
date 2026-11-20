@@ -99,6 +99,10 @@ rules, and each fix that taught something adds its rule here, never one case's d
 - **Measure before and after**, a state held (a median per stretch) for steady cost and a run of first uses for
   spikes, at the play size **and** at the largest resolution shipped (per-pixel cost scales with it). Here:
   `perfhold.sh` (its `fields` mode for ground marks), `perfrun.sh`, `firstfight.sh` for a build's first fight.
+- **GPU time can't be read in the Editor.** Unity's frame timing there reports a GPU time for only a few frames in a
+  hundred, and its frame includes the Editor's own windows (twice the whole frame's length): Editor frame times show a
+  steady cost only when it is large against their own swing (several ms at 4K). To prove a sub-millisecond GPU saving,
+  measure in a development build.
 - **Compare the look too:** a capture before and after at the same frame; an optimisation that changes the look is a
   look change, asked about, not a fix.
 - **Render tests by relation** (where ink lands, that it turns the right way, that it grows with its size), never a
