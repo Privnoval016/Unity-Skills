@@ -159,6 +159,28 @@ out rotationDelta)` — off by default; enabled only around specific root-motion
 (a lunge, a lift-off) and fed into the motion pipeline's own `RootMotionStage`, never applied directly
 by the driver. A driver with no animator (a debug visual) simply doesn't implement this interface.
 
+## Clips: Packs, Plans and Copies
+
+How clips get into a game:
+
+- **Packs stay outside version control** (a git-ignored folder under `Assets/`). Nothing in the project references a
+  pack file. Move a newly imported pack there through the Editor, so its GUIDs survive, and delete its demo scenes, demo
+  prefabs and demo controllers. Keep its models: a pack's humanoid clips often take their avatar from its own model.
+- **A character owns copies, as clip assets.** Every clip a character plays is a `.anim` of its own in that character's
+  folders, named after the character and the pack's own name. A clip that lives inside a pack's FBX is copied out as a
+  `.anim` (never referenced as the FBX's clip), so it retargets like any other.
+- **A clip plan is the record.** One file per character lists each owned clip: name, folder, source in the pack, mirror,
+  loop. An import tool copies from it; a clip is added by adding a row; a refresh keeps each clip's GUID and hand-placed
+  events.
+- **Look before taking.** Render a pack folder on the character's own model as contact sheets and judge every strip, not
+  the names. Write down what each pack holds, what was taken for whom, and the good clips left for later, so the next
+  search starts from it.
+
+In Chains of Contract: packs in `Assets/ExternalAssets/`, clips under `Assets/Players/<Character>/Animations/<Kind>/`,
+the plan `Animations/clip-plan.json` imported with `coc_clip_import`, sheets from `.claude/scripts/clipcatalog.sh
+<character> <folder>`, the packs written up in `Design/combat/animation-packs/`; the steps in
+`Design/combat/animation-guide.md`.
+
 ## Questions to Ask Before Implementing
 
 - Is this character animation (Animancer) or UI animation (PrimeTween)?
