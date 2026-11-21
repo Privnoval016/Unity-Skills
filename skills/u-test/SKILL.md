@@ -90,7 +90,9 @@ find a row fails naming the asset and the row kind.
 ## Proving a test
 
 - **The break proof**: break the code the test covers (ignore an input, drop a line, off-by-one a clamp), run, see it
-  fail, undo. A test that passes a break is vacuous: fix it before trusting it.
+  fail, undo. A test that passes a break is vacuous: fix it before trusting it. A proof counts only if the test passed
+  before the break: one that already fails (a fixture missing what it reads) "catches" every break and proves nothing,
+  so run it unbroken first.
 - **Which tests get one** (targeted, not every test): a proof costs a compile and a run, and the hollow tests it finds
   share a few shapes, so prove those shapes and skip the rest:
   - a test whose expected value is worked out through the code under test or code it shares (a reference rendered

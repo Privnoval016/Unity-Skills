@@ -141,6 +141,17 @@ when a specific actor is defeated" or "expires when a named status is removed el
 reuses the identical generic class with a different `TEvent` and predicate, not a parallel
 `DefeatScopedDuration` written from scratch.
 
+### Default interface members and a shared base
+
+When an interface gives a member a default body (a no-op `Entered`, a `false` capability), a class that inherits the
+interface only through a base class gets the interface's default, not its own public method of the same name, unless
+it names the interface itself. A base class that implements the interface and a subclass that "overrides" by declaring
+the same public method silently run the default: the subclass's method is never called through the interface. Fix it
+one of two ways: the base implements the members as `virtual` and subclasses `override` them; or each subclass
+re-declares the interface (`class Live : LiveBase<Kind>, IBehaviour`) so its own methods map. Have a test that calls
+through the interface, never only through the concrete type: it is what caught this when three live classes were
+folded onto one base (a fall stopped landing and only the behaviour's tests failed).
+
 ### No type checks in game logic
 
 Branching on what something *is* (`is`, `as`, `OfType<T>`, `GetType()`, a `switch` on type) is a
