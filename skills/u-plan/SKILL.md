@@ -6,7 +6,6 @@ description: >
 when_to_use: >
   "plan", "design", "implement", "add feature", "how should I implement", "think through",
   any request involving writing new systems or significant code changes.
-disable-model-invocation: true
 allowed-tools: Read Bash Edit Write Skill AskUserQuestion
 ---
 

@@ -4,7 +4,6 @@ description: >
   reviewers (correctness, design and smells, types and data, tests). Outputs via ReportFindings.
 when_to_use: >
   "review my code", "code review", "check my changes", "audit", "lint my branch".
-disable-model-invocation: true
 allowed-tools: Read Bash Agent
 ---
 
