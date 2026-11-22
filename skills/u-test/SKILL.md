@@ -80,6 +80,12 @@ A read value can hide a bug. These keep a read-and-relate test able to fail:
   the last (no pixel flickers off).
 - Graphics devices: a headless run started with `-nographics` can't make render textures; run such suites with
   graphics.
+- A test camera draws into a render target the test makes (`camera.targetTexture`), never the back buffer: a headless
+  Editor has no window, and a pipeline pass that blends into the camera's own attachments fails or reads garbage
+  there while it passes in the live Editor. Set each global a shader reads with the type it declares
+  (`SetGlobalFloat` for a float): a vector set under a float's name passes on one graphics API and not another.
+- A test that passes here and fails only in CI is first suspected of the difference between them (no window, another
+  graphics API, a fresh Library), and rerun there before it is believed fixed.
 
 ## Failure messages
 

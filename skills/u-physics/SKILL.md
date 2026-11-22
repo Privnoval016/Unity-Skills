@@ -123,6 +123,13 @@ When `UseUnscaledDeltaTime` is true and `Time.timeScale < 1`:
 
 Character moves at full real-world speed while the physics world slows.
 
+## Ground Probes
+
+A ray or sphere cast that finds the ground under something casts only against the ground's layers, a `LayerMask`
+field on the data whose tooltip says so, never every layer (`~0`). With every layer it finds whoever stands on the
+ground, so a body floating over a spot settles on a fighter's head, or a slam's impact plays in mid-air. One probe
+helper owns the cast (its height above the place, its reach down, triggers ignored); each caller passes its mask.
+
 ## Questions to Ask Before Implementing
 
 - Rigidbody or position-based movement?
