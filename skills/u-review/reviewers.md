@@ -18,7 +18,8 @@ empty, single, many, dead, missing, repeated, re-entered, out of order, cancelle
 Compare behaviour before and after the diff (`git diff`), and against `Design/combat/combat-design.md`
 and the assembly README. Check lifecycle pairs, exceptions skipping teardown, async work outliving its
 owner, statics left changed, serialized data a rename would lose. Report only what you can show with a
-concrete scenario.
+concrete scenario. For a refactor, compare each old expression with its new form, implementer by implementer, and
+check every value now set or cached instead of read live on the paths that read it before it is set.
 
 ## Design
 

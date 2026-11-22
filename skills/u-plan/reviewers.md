@@ -33,13 +33,16 @@ such member the section leaves out, and a section that is missing.
 List every rule the design decided for this work (quote the doc or ruling) and find the plan step that
 builds it; report each one with no step, and each step that builds something nobody decided. Construct the
 cases that break it: empty, single, many, dead, missing, repeated, re-entered, out of order, cancelled,
-joined mid-way, saved and loaded. Report every point the plan settles by assumption where the docs are
+joined mid-way, saved and loaded. Check every decision the user recorded for this work has a step (a decision with no
+home is a finding). Report every point the plan settles by assumption where the docs are
 silent or marked Open: those are questions for the user, not choices for the plan.
 
 ## Data and authoring
 
 Every gameplay and tuning number lives in data and goes through the stat pipeline; every Inspector pick
 is an asset or a dropdown that offers only valid choices, never a typed key; every value has one owner.
+Check that each new field or row is easy and natural to author (the plan's Authoring section): a tooltip that says
+what it does, a sensible default, hidden until it applies, and a warning for a setup that would do nothing.
 Check what the plan does to existing assets (a migration step, or a silent default that changes them),
 to saves (schema, fixtures, a loaded old save), and to recorded baselines. Flag `object`-typed members
 and raw primitives standing for ids, kinds or durations in the proposed signatures.
@@ -50,4 +53,7 @@ For each step, name the test that would fail if it were built wrong, or report t
 the cases are concrete (edge, boundary, regression), not one token test; that each verification command
 exists and fails when the step is wrong; that existing behaviour the plan changes on purpose is pinned
 before and re-recorded deliberately; and that no step can only be verified by eye when a test could do it.
-Propose each missing test as a name plus what it asserts.
+Flag any planned test that would pin a value a designer can tune (it should read the value from the asset or use
+made data), any assert inside a callback with no assert that the callback ran, and any loop whose assert passes on an
+empty set. Name the hollow-prone tests that should get a break proof (the code broken on purpose, the test seen to
+fail). Propose each missing test as a name plus what it asserts.

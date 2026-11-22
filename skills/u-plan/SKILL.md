@@ -36,6 +36,13 @@ Before forming any questions:
    `Design/GAME.md` and `Design/STYLE.md`), any feature with a visible surface is planned against
    them, and any decision they mark **Open** is asked about, never assumed.
 5. Identify every file, system, or SO that this feature will interact with.
+6. If the project has its own workflow skill, engineering rules or reuse index (a `coc-workflow`-style skill, a
+   `Design/project/engineering-rules.md`, a reuse skill listing its shared pieces), read them: they hold the project's
+   standing practices and override this skill's defaults where they differ.
+7. Read the design doc and guide of every area the feature touches, by section, and trust them. Where one is wrong,
+   the plan fixes it. Never state a number, rule or name from memory: read the asset or the doc that holds it.
+8. Explore wide work through small read-only agents (one per area, each with the files to read, what to report, and
+   each claim marked read or inference), and read their reports' load-bearing claims yourself before relying on them.
 
 ---
 
@@ -47,6 +54,20 @@ Ask as many question groups as the task requires. Do not compress distinct conce
 vague question. The goal is to eliminate all ambiguity before touching a file.
 
 Cover every relevant area below. Skip a section only if it provably does not apply.
+
+**How questions are asked and recorded** (these hold whatever the area):
+- Ask directly in the conversation (`AskUserQuestion`): up to four at a time, two to four options each, the
+  recommended one first and marked "(Recommended)", each saying what is already decided and what each option leads
+  to. Never route the plan through a planning mode; the user approves it in the conversation.
+- **One decision per question.** An option the user picks confirms what the question asked, not every field the option
+  happened to describe; ask the fields separately when they matter.
+- **Never decide for the user.** What the docs mark Open, what they are silent on, a name, a story element or a number
+  nobody set is a question, never a choice the plan makes. A contradiction between two answers is asked again.
+- **Record the answers word for word** where the project keeps decision records, with a line-by-line table marking
+  each line a doc gains as the user's words, carried, or added by the planner (an added line is Proposed until asked).
+- **Every decision gets a home**: each decided item that changes the game is a plan step, a to-do item, or built at
+  once; a decision with none is a gap to fix before the next question.
+- Visual questions are answered with mock-ups drawn over real captures of the product, never from memory.
 
 ### Feature Scope
 - What is the exact behavior of this feature? Where does it start and stop?
@@ -75,6 +96,8 @@ Cover every relevant area below. Skip a section only if it provably does not app
 - Global broadcast (EventBus<T>), tight coupling (C# event), or SO channel?
 
 ### Performance
+- Does it cost at first use (a compile, an instantiation, a shader variant)? A spike is worse than a steady cost.
+- How is it measured before and after (the project's frame tools), for per-frame code, large surfaces or shaders?
 - Is any code in Update, FixedUpdate, or a per-frame callback?
 - Are there LINQ queries that need ZLinq?
 - Is there runtime instantiation that needs pooling?
@@ -108,12 +131,33 @@ After the user has answered all questions, write a concrete implementation plan:
 ## Implementation Steps
 1. <First thing to do — specific>
 2. …
+<Small steps, each committed when it compiles with its tests green and its docs moved. General seams first: a
+character's or a feature's mechanic is built from general pieces, never as an engine concept named after it. Visual or
+structural work maps its parts and joints, and is reviewed, before it is built; never patch and recapture.>
 <Mark each part that is a defined task (written input, files or a report out, a checkable done-when: tests for a
 finished design, a helper to a spec, a doc sweep) as one a small agent can take beside the main work; it keeps the
 main context clean and runs in parallel. Editor work and open judgements stay with the main session.>
 
 ## Architecture Notes
 <Key decisions and why — reference answers from the Q&A>
+
+## Folders
+<Every new file's folder, named for its purpose and planned now, never moved later; split a folder before it holds
+about eight loose files; each new folder gets its README and its line in the project's code map.>
+
+## Authoring
+<For each new serialized field or row: its tooltip, its default, what its picker offers (only valid choices: a narrow
+type or a dropdown of what exists, never a typed key), what is hidden until it applies, and the warning shown for a
+setup that would do nothing. Designers should find each seam easy and natural to author.>
+
+## Tests
+<Concrete cases per subsystem: edge, boundary, regression, empty, single, many, repeated, saved and loaded. A test never
+pins a value a designer can tune (read it from the asset, or use made data); an assert inside a callback needs an
+assert that the callback ran. Name the hollow-prone tests that get a break proof.>
+
+## Docs
+<Per step, every doc that describes what it changes: its design doc and guide, its folder README, the content index for
+a new kind of asset, the to-do. Docs move in the same commit as the change.>
 
 ## Who pays
 <Every field, flag, reference, list, interface member or branch the plan adds to a SHARED type (a component, config,
@@ -199,10 +243,17 @@ For a large plan, review it again after big changes; a re-review only reads what
 
 ---
 
-## Step 5: ExitPlanMode
+## Step 5: Present
 
-After the design review, call `ExitPlanMode` to present the plan to the user for approval before any
-implementation begins, with the review's open questions asked alongside it.
+After the design review, present the plan in the conversation for the user's approval before any implementation
+begins (no planning mode), with the review's open questions asked alongside it (`AskUserQuestion`). Record the
+answers as Step 2 says, fold them into the plan, and index the plan where the project lists its plans.
+
+## Step 6: Build and close
+
+Build in the plan's steps. A large step's staged diff gets a reviewer before it is committed; every line a helper agent
+wrote is read before it is staged. The feature ends with the code review (`../u-review`), its findings fixed, the docs
+checked, the lessons added to the skill that covers them as general rules, and the user's own check in the product.
 
 ---
 

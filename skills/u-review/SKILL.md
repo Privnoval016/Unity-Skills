@@ -20,6 +20,10 @@ kept to the reviewed plan (a departure is a finding unless the plan was changed 
 
 ## How the review runs
 
+If the project has its own closing or review skill (a closing pass that names more viewpoints: structure, data and
+scalability, authoring, docs), it decides how many reviewers run and what they read; this skill's four are the code
+reviewers within it.
+
 One lead (you) and four reviewers, each with one viewpoint. Four is enough to cover the ground without
 reviewers repeating each other; do not add more for a small change, and for a change of a file or two
 run the passes yourself.
@@ -29,14 +33,21 @@ run the passes yourself.
 2. **Reviewers run in parallel**, read-only (`code-auditor` agent, or general-purpose told it may not
    edit), on a cheaper model (sonnet). Each gets the scope, its brief from
    [reviewers.md](reviewers.md), and its checklist sections below. Each reads every file in its scope
-   in full and returns findings as file:line · rule · what is wrong · failure scenario · fix.
+   in full and returns findings as file:line · rule · what is wrong · failure scenario · fix. Reviewers read the
+   committed or staged copy, so builds, tests and break proofs can run beside them; brief each with the code and the
+   docs, never with the lead's own conclusion.
 3. **Lead consolidates.** Merge duplicates (two reviewers on one line is one finding), drop findings
    that contradict a documented decision (`Design/`, an accepted audit baseline), and **verify every
-   remaining finding by opening the lines**. A plausible guess is not a finding.
+   remaining finding by opening the lines**. A plausible guess is not a finding. A finding that needs a decision the
+   docs don't hold becomes a question for the user, never a fix chosen in their place. Keep the findings in one log
+   with each one's outcome (fixed, its test; no change needed, why; left for later, its home).
 4. **Rank** most severe first: wrong behaviour or lost data, then a rule the project calls hard (types,
    hardcoded values, typed keys, type checks), then design and smells, then style.
 5. **Report** with `ReportFindings`, not as text. When asked to fix: fix, rebuild, re-run the touched
    tests, and re-report with each finding's outcome.
+6. **Fixes are reviewed too.** Every line a helper agent wrote is read before it is staged, as if written by hand. A
+   fix big enough to matter (a refactor, a few hundred lines) gets one reviewer on its staged diff, and a new test on
+   a hollow-prone shape gets a break proof (the fix undone, the test seen to fail).
 
 ## Non-C# changes
 
@@ -115,7 +126,9 @@ Which reviewer owns each section is in [reviewers.md](reviewers.md).
       project skill listing them): a copy of an existing shared piece is a finding at the first copy
 
 ### Refactor vs feature
-- [ ] A commit called a refactor changes no behaviour, and ships no feature or balance change
+- [ ] A commit called a refactor changes no behaviour, and ships no feature or balance change: each old expression is
+      compared with its new form, case by case (each implementer of a strategy, each default), and any state that used
+      to be read live and is now set or cached is checked on every path that reads it (an early return, a first call)
 - [ ] A test changed in a refactor is explained (behaviour changed, or it was coupled to internals)
 - [ ] Renamed fields and moved `[SerializeReference]` types carry `[FormerlySerializedAs]` / `[MovedFrom]`
       or a migration script, and a before/after snapshot shows the data is unchanged
@@ -134,6 +147,9 @@ Which reviewer owns each section is in [reviewers.md](reviewers.md).
 - [ ] `OnValidate()` derives low-level constants; derived fields have `[HideInInspector]`
 - [ ] Scalability: a new character, weapon, element or variant needs a new asset, not a code edit
 - [ ] Organisation: purpose-named folders, nothing loose beside an asmdef, one owner per value
+- [ ] Authoring: each new serialized field has a tooltip, a sensible default, is hidden until it applies, and its
+      picker offers only valid choices (a narrow type or a dropdown of what exists); a setup that would do nothing warns
+- [ ] Docs: every doc that describes the changed code (its design doc, guide, folder README) says what it does now
 
 ### Performance (`u-arch`)
 - [ ] No `Find` / `FindObjectOfType` / `FindFirstObjectByType` / `FindGameObjectWithTag` at runtime
@@ -148,13 +164,16 @@ Which reviewer owns each section is in [reviewers.md](reviewers.md).
 - [ ] Lifecycle: subscribe/unsubscribe pair, teardown runs on exceptions and on disable, no stale reference after re-enable
 - [ ] Async: no fire-and-forget that can outlive its owner; cancellation honoured
 - [ ] Statics and registries restored after use (tests and fights both)
-- [ ] Behaviour matches `Design/combat/combat-design.md` and the assembly README, or they are updated
+- [ ] Behaviour matches the project's design docs and the assembly README, or they are updated
+- [ ] Each failure the CI or the full suite reports is read and fixed or explained, the old ones included
 
 ### Tests
 - [ ] Every changed behaviour has a test that fails without the change
 - [ ] Edge, boundary and regression cases, not only the happy path
 - [ ] Each test sets up its own state (stat bases, registries) and restores it in `finally` or TearDown
 - [ ] No vacuous assert (a loop over an empty set, an assert that can't fail); empty sets guarded with `Is.Not.Empty`
+- [ ] An assert inside a callback has an assert that the callback ran
+- [ ] No test pins a value a designer can tune; it reads the asset or uses made data
 - [ ] Names say the behaviour; created ScriptableObjects destroyed
 - [ ] Tests match the project as it is now, not a removed design
 
