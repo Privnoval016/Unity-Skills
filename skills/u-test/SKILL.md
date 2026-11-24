@@ -39,6 +39,8 @@ A read value can hide a bug. These keep a read-and-relate test able to fail:
 - **Never re-implement the formula.** Check a ratio through the real thing: a reference result divided by its read
   input gives "per unit"; each other result is that times its own read input. `Assume.That(input != reference)` so a
   tweak to equal values can't hide an "input ignored" bug.
+- **Never re-implement the code under test inside the test** (a copy of a player's loop, a formula written again): it
+  passes whatever the real code does. Drive the real thing, or test the smaller real part it is built from.
 - **Evaluate with an independent evaluator.** A curve's points are read raw and evaluated by the engine's own
   `AnimationCurve.Evaluate`, never by the code under test.
 - **Check a cost three ways**: the serialized row, what the build makes of it, and the gauge's change after use.
@@ -59,6 +61,12 @@ A read value can hide a bug. These keep a read-and-relate test able to fail:
   made the next test compare them against themselves.)
 - Never leave global state behind: services registered, static flags, globals set, Play Mode entered. Restore in a
   `finally` or teardown.
+
+## Content guards
+
+A test that guards shipped content (every member has falls, every action a targeting row) demands what the code really
+needs, no more: a slot the code falls back from is optional, and the guard, the field's tooltip and the guide say the same
+thing. A guard stricter than the code is a false alarm a designer meets with no hint.
 
 ## Asserting what ran
 
